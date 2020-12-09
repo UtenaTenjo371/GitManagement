@@ -22,7 +22,7 @@ public class Task1 {
     }
 //main用来测试，运行看起来应该是可以的
     public static void main(String[] args) {
-        String dir1 = "E:\\IMG_9726.jpg";
+        String dir1 = "E:\\test.txt";
         String dir2 = "E:\\IMG_9727.jpg";
         File f1 = new File(dir1);
         File f2 = new File(dir2);
@@ -46,6 +46,8 @@ public class Task1 {
         System.out.println(hash3);
         System.out.println(gto1.getKey());
         System.out.println(gto2.getKey());
+        System.out.println(a.st.find(hash1));
+
     }
 }
 //----------------BinarySearchST-------------------
