@@ -1,19 +1,38 @@
 package HWTest;
 
-import java.security.MessageDigest;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.Serializable;
 
 public class Task1 {
     private BinarySearchST st;
+    private String fileDir;
 
-    public Task1() {
-        this.st = new BinarySearchST(20);
+    //默认构造函数，如果不给文件路径就当做不存文件
+    public Task1(){
+        this(20);
+    }
+    public Task1(int num) {
+        this.st = new BinarySearchST(num);
+        this.fileDir= null;
+    }
+
+    //给了文件路径的构造函数，用来读取已有的文件目录
+    public Task1(String fileDir) {
+        this.st = (BinarySearchST)saveObject.readObjectFromFile(fileDir);
+        this.fileDir =fileDir;
+    }
+    //给了数组长度与文件路径的构造函数，用来写入新的文件
+    public Task1(int num, String fileDir) {
+        this(num);
+        this.fileDir =fileDir;
     }
 
     public String add(GitObject f) {
         String hash = f.getKey();
         st.add(hash, f);
+        if (fileDir != null){
+            saveObject.writeObjectToFile(fileDir, st);
+        }
         return hash;
     }
 
@@ -32,7 +51,7 @@ public class Task1 {
         TreeObject[] trees = new TreeObject[0];
         TreeObject tree = new TreeObject("10401206", blobs, trees);
 
-        Task1 a = new Task1();
+        Task1 a = new Task1(20, "F:\\task1test");
 
         String hash1 = a.add(blobs[0]);
         String hash2 = a.add(blobs[1]);
@@ -48,16 +67,23 @@ public class Task1 {
         System.out.println(gto2.getKey());
         System.out.println(a.st.find(hash1));
 
+        Task1 b=new Task1("F:\\task1test");
+        GitObject gto3 = b.get(hash1);
+        System.out.println(gto3.getKey());
+
     }
 }
 //----------------BinarySearchST-------------------
-class BinarySearchST {
+class BinarySearchST implements Serializable{
     // 0:小 -> n-1:大
     //用n标记当前位置
     private String[] key;
     private GitObject[] value;
     private int n;
     private int maxN;
+
+    //Serializable要的ID
+    private static final long serialVersionUID =9876543210123L;
 
     public BinarySearchST(int num){
         this.maxN = num;
