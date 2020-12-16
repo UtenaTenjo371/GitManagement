@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public abstract class GitObject implements Serializable, Comparable<GitObject>{
     private String key;
-    //Serializable要的ID
+    /**Serializable要的ID*/
     private static final long serialVersionUID =9876543212345L;
 
     public void updateKey(){

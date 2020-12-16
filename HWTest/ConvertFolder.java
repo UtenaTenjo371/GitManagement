@@ -52,9 +52,10 @@ class ConvertFolder{
         System.out.println("请输入一个文件夹的绝对路径：");
         Scanner sc = new Scanner(System.in);
         String path = sc.nextLine();
+        String sPath= path+"\\.git\\gitSaving";
         sc.close();
 
-        Task1 a = new Task1();
+        Task1 a = new Task1(20,sPath);
         ConvertFolder convertFolder = new ConvertFolder();
         TreeObject tree = convertFolder.dfs(path, a);
 

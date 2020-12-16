@@ -18,7 +18,7 @@ public class Task1 {
 
     //给了文件路径的构造函数，用来读取已有的文件目录
     public Task1(String fileDir) {
-        this.st = (BinarySearchST)saveObject.readObjectFromFile(fileDir);
+        this.st = (BinarySearchST)SaveObject.readObjectFromFile(fileDir);
         this.fileDir =fileDir;
     }
     //给了数组长度与文件路径的构造函数，用来写入新的文件
@@ -31,7 +31,7 @@ public class Task1 {
         String hash = f.getKey();
         st.add(hash, f);
         if (fileDir != null){
-            saveObject.writeObjectToFile(fileDir, st);
+            SaveObject.writeObjectToFile(fileDir, st);
         }
         return hash;
     }
