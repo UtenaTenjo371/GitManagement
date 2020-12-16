@@ -17,7 +17,8 @@ public class saveObject{
     try {
       out = new FileOutputStream(file);
       ObjectOutputStream objOut=new ObjectOutputStream(out);
-      objOut.writeObject(obj);
+      objOut
+              .writeObject(obj);
       objOut.flush();
       objOut.close();
       System.out.println("write object success!");
