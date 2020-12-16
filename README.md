@@ -10,7 +10,7 @@
 
 UML类图
 
-![UML类图](C:\Users\29574\Pictures\Saved Pictures\GitManage (3).png)
+![GitManage (3)](https://raw.githubusercontent.com/UtenaTenjo371/GitManagement/zjq/3-Task3-Commit/Docs/Img/GitManage%20(3).png)
 
 Commit结构示意图
 
@@ -25,8 +25,6 @@ VersionController类存放head指针和版本控制方法。
 #### 类图
 
 待完善。
-##### Task3类图
-![GitManage (3)](https://raw.githubusercontent.com/UtenaTenjo371/GitManagement/zjq/3-Task3-Commit/Docs/Img/GitManage%20(3).png)
 
 ## 成员
 ZJQ[@UtenaTenjo371](https://github.com/UtenaTenjo371)  ZSW[@Windyabc](https://github.com/Windyabc)  CYB[@YanbingChen](https://github.com/YanbingChen)
