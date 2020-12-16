@@ -82,12 +82,4 @@ class Quick {
     }
 
 
-    public static void main(String[] args){
-        Integer[] a = {3,6,9,5,2,3};
-        sort(a);
-        for(int i=0; i<a.length; i++){
-            System.out.print(a[i] + " ");
-        }
-    }
-
 }

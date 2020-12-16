@@ -53,8 +53,10 @@ class ConvertFolder{
         Scanner sc = new Scanner(System.in);
         String path = sc.nextLine();
         sc.close();
+        String sPath= path+"\\gitSaving";
 
-        Task1 a = new Task1();
+        VersionController vc=new VersionController(path);
+        Task1 a = new Task1(20,vc.getPath());
         ConvertFolder convertFolder = new ConvertFolder();
         TreeObject tree = convertFolder.dfs(path, a);
 
@@ -71,5 +73,9 @@ class ConvertFolder{
         for(int i=0; i<trees.length; i++){
             System.out.println(trees[i].getDirName());
         }
+        //Commit测试
+        Branch newHead=vc.updateHead(tree,a);
+        System.out.println("------------");
+        System.out.println(newHead.getBranchName()+" "+newHead.getKey());
     }
 }
