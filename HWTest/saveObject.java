@@ -20,9 +20,9 @@ public class SaveObject{
       objOut.writeObject(obj);
       objOut.flush();
       objOut.close();
-      System.out.println("write object success!");
+      //System.out.println("write object success!");
     } catch (IOException e) {
-      System.out.println("write object failed");
+      //System.out.println("write object failed");
       e.printStackTrace();
     }
   }
