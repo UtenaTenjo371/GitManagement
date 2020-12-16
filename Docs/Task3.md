@@ -14,13 +14,13 @@
 
 ### 层次图（模块间的调用关系）
 
-![GitManage](C:\Users\29574\Downloads\GitManage.png)
+![GitManage](https://raw.githubusercontent.com/UtenaTenjo371/GitManagement/zjq/3-Task3-Commit/Docs/Img/GitManage.png)
 
 
 
 ### 类图
 
-![GitManage (3)](C:\Users\29574\Pictures\Saved Pictures\GitManage (3).png)
+![GitManage (3)](https://raw.githubusercontent.com/UtenaTenjo371/GitManagement/zjq/3-Task3-Commit/Docs/Img/GitManage%20(3).png)
 
 VersionController类：管理版本，存储Branch类指针head，指向当前所在commit结点。该类定义了版本管理方法：在当前branch提交commit、创建分支、切换分支、合并分支、版本回退。
 
@@ -30,4 +30,4 @@ CommitObject类：继承自GitObject类，存储Commit对象。Commit对象分�
 
 ### Commit结构示意图
 
-![Commit结构](C:\Users\29574\Downloads\GitManage (5).png)
+![Commit结构](https://raw.githubusercontent.com/UtenaTenjo371/GitManagement/zjq/3-Task3-Commit/Docs/Img/GitManage%20(5).png)
