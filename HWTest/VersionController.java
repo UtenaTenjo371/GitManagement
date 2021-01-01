@@ -24,7 +24,7 @@ public class VersionController {
         this.path=path;
         this.sPath=path+"\\gitSaving";
         System.out.println(sPath);
-        this.store=new ObjectStore(20,sPath);
+        this.store=new ObjectStore(sPath);
         ConvertFolder convertFolder = new ConvertFolder();
         TreeObject initTree=convertFolder.dfs(path, store);
         this.head=new Branch("main",new CommitObject(initTree,null));
