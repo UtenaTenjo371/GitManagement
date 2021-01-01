@@ -1,9 +1,23 @@
 package HWTest;
 
+import java.util.Vector;
+
 public class TreeObject extends GitObject{
     private final String dirName;
     private final BlobObject[] blobs;
     private final TreeObject[] trees;
+
+    //传Vector的构造方法
+    public TreeObject(String dirName, Vector<BlobObject> vb, Vector<TreeObject> vt){
+        BlobObject[] blobs = new BlobObject[vb.size()];
+        TreeObject[] trees = new TreeObject[vt.size()];
+        vb.toArray(blobs);
+        vt.toArray(trees);
+        this.dirName = dirName;
+        this.blobs = blobs;
+        this.trees = trees;
+        updateKey(); // 设置key
+    }
 
     public TreeObject(String dirName, BlobObject[] blobs, TreeObject[] trees){
         this.dirName = dirName;
