@@ -18,7 +18,7 @@ class ConvertFolder{
         }
     };
 
-    public TreeObject dfs(String path, Task1 a){
+    public TreeObject dfs(String path, ObjectStore a){
         File dir = new File(path);
         File[] fs = dir.listFiles();
         Arrays.sort(fs,comparatorFile);
@@ -56,7 +56,7 @@ class ConvertFolder{
         String sPath= path+"\\gitSaving";
 
         VersionController vc=new VersionController(path);
-        Task1 a = new Task1(20,vc.getPath());
+        ObjectStore a = new ObjectStore(20,vc.getPath());
         ConvertFolder convertFolder = new ConvertFolder();
         TreeObject tree = convertFolder.dfs(path, a);
 

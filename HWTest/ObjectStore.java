@@ -3,26 +3,26 @@ package HWTest;
 import java.io.File;
 import java.io.Serializable;
 
-public class Task1 {
+public class ObjectStore {
     private BinarySearchST st;
     private String fileDir;
 
     //默认构造函数，如果不给文件路径就当做不存文件
-    public Task1(){
+    public ObjectStore(){
         this(20);
     }
-    public Task1(int num) {
+    public ObjectStore(int num) {
         this.st = new BinarySearchST(num);
         this.fileDir= null;
     }
 
     //给了文件路径的构造函数，用来读取已有的文件目录
-    public Task1(String fileDir) {
+    public ObjectStore(String fileDir) {
         this.st = (BinarySearchST)SaveObject.readObjectFromFile(fileDir);
         this.fileDir =fileDir;
     }
     //给了数组长度与文件路径的构造函数，用来写入新的文件
-    public Task1(int num, String fileDir) {
+    public ObjectStore(int num, String fileDir) {
         this(num);
         this.fileDir =fileDir;
     }
@@ -51,7 +51,7 @@ public class Task1 {
         TreeObject[] trees = new TreeObject[0];
         TreeObject tree = new TreeObject("10401206", blobs, trees);
 
-        Task1 a = new Task1(20, "F:\\task1test");
+        ObjectStore a = new ObjectStore(20, "F:\\task1test");
 
         String hash1 = a.add(blobs[0]);
         String hash2 = a.add(blobs[1]);
@@ -67,7 +67,7 @@ public class Task1 {
         System.out.println(gto2.getKey());
         System.out.println(a.st.find(hash1));
 
-        Task1 b=new Task1("F:\\task1test");
+        ObjectStore b=new ObjectStore("F:\\task1test");
         GitObject gto3 = b.get(hash1);
         System.out.println(gto3.getKey());
 
