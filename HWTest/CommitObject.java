@@ -18,6 +18,15 @@ public class CommitObject extends GitObject{
         return ObjectStore.getCommit(mergeParent);
     }
 
+    /** 第一次commit的构造方法*/
+    public CommitObject(TreeObject rootTree){
+        rootTree.save();
+        this.rootTree = rootTree.getKey();
+        this.parent = null;
+        this.mergeParent=null;
+        updateKey(); // 设置key
+        save();
+    }
     /** 一般commit的构造方法*/
     public CommitObject(TreeObject rootTree, CommitObject parent){
         rootTree.save();
