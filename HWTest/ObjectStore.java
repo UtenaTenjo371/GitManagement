@@ -5,23 +5,17 @@ import java.io.Serializable;
 
 public class ObjectStore {
 
-    private final String rootDir;
+    private static final String rootDir=".mygit\\objects";
 
-    //默认构造函数，如果不给文件路径就我们建一个默认的存进去
+    //构造函数，在当前目录的给定路径下存储各个objects
     public ObjectStore(){
-        this(".mygit\\objects");
-    }
-
-    //给了文件路径的构造函数，用来指定文件目录存储
-    public ObjectStore(String rootDir) {
         File dirFile = new File(rootDir);
         if (!dirFile.isDirectory()){
             dirFile.mkdirs();
         }
-        this.rootDir =rootDir;
     }
 
-    public String add(GitObject f) {
+    public static String add(GitObject f) {
         String hash = f.getKey();
         //模仿git的存法，上层路径名是hash前两位，文件名是hash后38位
         String dirname = hash.substring(0,2);
@@ -34,7 +28,7 @@ public class ObjectStore {
         return hash;
     }
 
-    public GitObject get(String key) {
+    public static GitObject get(String key) {
         String dirname = key.substring(0,2);
         String filename = key.substring(2);
         File dirFile = new File(rootDir+"\\"+dirname);
@@ -56,7 +50,7 @@ public class ObjectStore {
         TreeObject[] trees = new TreeObject[0];
         TreeObject tree = new TreeObject("10401206", blobs, trees);
 
-        ObjectStore a = new ObjectStore("F:\\task1test");
+        ObjectStore a = new ObjectStore();
 
         String hash1 = a.add(blobs[0]);
         String hash2 = a.add(blobs[1]);
@@ -72,7 +66,7 @@ public class ObjectStore {
         System.out.println(gto2.getKey());
 
 
-        ObjectStore b=new ObjectStore("F:\\task1test");
+        ObjectStore b=new ObjectStore();
         GitObject gto3 = b.get(hash1);
         System.out.println(gto3.getKey());
 

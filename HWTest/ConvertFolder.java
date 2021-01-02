@@ -56,7 +56,7 @@ class ConvertFolder{
         String sPath= path+"\\gitSaving";
 
         VersionController vc=new VersionController(path);
-        ObjectStore a = new ObjectStore(vc.getPath());
+        ObjectStore a = new ObjectStore();
         ConvertFolder convertFolder = new ConvertFolder();
         TreeObject tree = convertFolder.dfs(path, a);
 
