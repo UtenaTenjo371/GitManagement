@@ -4,25 +4,48 @@ import java.util.Vector;
 
 public class TreeObject extends GitObject{
     private final String dirName;
-    private final BlobObject[] blobs;
-    private final TreeObject[] trees;
+    private final String[] blobs;
+    private final String[] trees;
+//为了内存考虑，每个TreeObject只存其中文件和文件夹的key，不再重复存文件。
 
     //传Vector的构造方法
     public TreeObject(String dirName, Vector<BlobObject> vb, Vector<TreeObject> vt){
-        BlobObject[] blobs = new BlobObject[vb.size()];
-        TreeObject[] trees = new TreeObject[vt.size()];
-        vb.toArray(blobs);
-        vt.toArray(trees);
+        BlobObject[] blobObjects = new BlobObject[vb.size()];
+        TreeObject[] treeObjects = new TreeObject[vt.size()];
+        vb.toArray(blobObjects);
+        vt.toArray(treeObjects);
         this.dirName = dirName;
-        this.blobs = blobs;
-        this.trees = trees;
+        this.blobs = new String[blobObjects.length];
+        this.trees = new String[treeObjects.length];
+
+        for (int i=0; i<blobObjects.length; i++){
+            //保证所存的blob哈希值对应的object能在存储中找到
+            blobObjects[i].save();
+            this.blobs[i] =blobObjects[i].getKey();
+        }
+        for (int i=0; i<treeObjects.length; i++){
+            //保证所存的tree哈希值对应的object能在存储中找到
+            treeObjects[i].save();
+            this.trees[i] =treeObjects[i].getKey();
+        }
         updateKey(); // 设置key
     }
 
     public TreeObject(String dirName, BlobObject[] blobs, TreeObject[] trees){
         this.dirName = dirName;
-        this.blobs = blobs;
-        this.trees = trees;
+        this.blobs = new String[blobs.length];
+        this.trees = new String[trees.length];
+
+        for (int i=0; i<blobs.length; i++){
+            //保证所存的blob哈希值对应的object能在存储中找到
+            blobs[i].save();
+            this.blobs[i] =blobs[i].getKey();
+        }
+        for (int i=0; i<trees.length; i++){
+            //保证所存的tree哈希值对应的object能在存储中找到
+            trees[i].save();
+            this.trees[i] =trees[i].getKey();
+        }
         updateKey(); // 设置key
     }
 
@@ -33,14 +56,17 @@ public class TreeObject extends GitObject{
 
         // 2 UPDATE HASH
         CalcHash ch = new CalcHash();
-        for(BlobObject bo : blobs){
+
+        for(int i=0; i<blobs.length; i++){
+            BlobObject bo = ObjectStore.getBlob(blobs[i]);
             ch.addString(bo.getFileName());
-            ch.addString(bo.getKey());
+            ch.addString(bo.getKey()); //这个其实也可以直接加blobs[i]
         }
 
-        for(TreeObject bo : trees){
-            ch.addString(bo.getDirName());
-            ch.addString(bo.getKey());
+        for(int i=0; i< trees.length; i++){
+            TreeObject tr = ObjectStore.getTree(trees[i]);
+            ch.addString(tr.getDirName());
+            ch.addString(tr.getKey()); //这个其实也可以直接加trees[i]
         }
 
         return ch.getHash();
@@ -51,11 +77,19 @@ public class TreeObject extends GitObject{
     }
 
     public BlobObject[] getBlobs() {
-        return blobs;
+        BlobObject[] bos = new BlobObject[blobs.length];
+        for(int i=0; i<blobs.length; i++){
+            bos[i] = ObjectStore.getBlob(blobs[i]);
+        }
+        return bos;
     }
 
     public TreeObject[] getTrees() {
-        return trees;
+        TreeObject[] trs = new TreeObject[trees.length];
+        for(int i=0; i< trees.length; i++){
+            trs[i] = ObjectStore.getTree(trees[i]);
+        }
+        return trs;
     }
 }
 

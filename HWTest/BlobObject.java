@@ -2,6 +2,7 @@ package HWTest;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.Vector;
 
 public class BlobObject extends GitObject {
@@ -19,6 +20,7 @@ public class BlobObject extends GitObject {
         readfile(file);
         updateKey(); // 设置key
     }
+
     private void readfile(File f){
         try {
             FileInputStream is = new FileInputStream(f);
@@ -35,6 +37,22 @@ public class BlobObject extends GitObject {
             e.printStackTrace();
         }
     }
+
+    private boolean writefile(File f){
+        boolean writeDone = false;
+        try {
+            FileOutputStream os = new FileOutputStream(f);
+            for (byte[] d: this.data) {
+                os.write(d);
+            }
+            os.close();
+            writeDone = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return writeDone;
+    }
+
     public String calcKey() {
         CalcHash ch = new CalcHash();
         ch.addString(fileName);
@@ -50,8 +68,13 @@ public class BlobObject extends GitObject {
         return data;
     }
 
-    // 预计实现： 将数据恢复到目标文件
+    // 将Blob的数据恢复到目标位置
     public boolean restoreData(String targetDir){
-        return true;
+        File dirFile =new File(targetDir);
+        if (!dirFile.isDirectory()){
+            dirFile.mkdirs();
+        }
+        File targetFile = new File(targetDir +"\\" +this.fileName);
+        return writefile(targetFile);
     }
 }

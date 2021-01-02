@@ -38,6 +38,19 @@ public class ObjectStore {
         return (GitObject)SaveObject.readObjectFromFile(dirFile.getPath()+"\\"+filename);
     }
 
+    //对应返回不同种类的GitObject的get方法
+    public static BlobObject getBlob(String key){
+        return (BlobObject)get(key);
+    }
+
+    public static TreeObject getTree(String key){
+        return (TreeObject)get(key);
+    }
+
+    public static CommitObject getCommit(String key){
+        return (CommitObject)get(key);
+    }
+
 //main用来测试，运行看起来应该是可以的
     public static void main(String[] args) {
         String dir1 = "F:\\test.txt";
