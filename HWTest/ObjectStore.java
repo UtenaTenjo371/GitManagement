@@ -80,7 +80,28 @@ public class ObjectStore {
         }
         return true;
     }
-
+    /**存储head*/
+    public static String saveHead(Branch head) {
+        String headName=head.getBranchName();
+        File dirFile = new File(rootDir);
+        if (!dirFile.isDirectory()){
+            dirFile.mkdir();
+        }
+        SaveObject.writeObjectToFile(dirFile.getPath()+"\\HEAD",headName);
+        return headName;
+    }
+    /**获得head*/
+    public static Branch getHead(){
+        File dirFile = new File(rootDir+"\\HEAD");
+        if (!dirFile.isFile()){
+            return null;
+        }
+        String headBranch=(String)SaveObject.readObjectFromFile(dirFile.getPath());
+        System.out.println(headBranch);
+        Branch head=new Branch();
+        System.out.println(getBranch(headBranch).getBranchName());
+        return head;
+    }
 //main用来测试，运行看起来应该是可以的
     public static void main(String[] args) {
         /*String dir1 = "F:\\test.txt";
@@ -122,6 +143,10 @@ public class ObjectStore {
         TreeObject t=ObjectStore.getTree(c.getRootTree().getKey());
         System.out.println(t.getDirName());
         System.out.println(isBranch("main"));
+        Branch head=new Branch();
+        saveHead(head);
+        isBranch(getHead().getBranchName());
+        //System.out.println(getHead());
     }
 }
 

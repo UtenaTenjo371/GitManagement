@@ -1,8 +1,11 @@
 package HWTest;
 
+import java.io.File;
+
 public class VersionController {
     private final String path;//文件夹路径
     private Branch head;//head指向工作区的branch分支
+    private String savePath=".mygit";
 
     public String getPath() {
         return path;
@@ -18,8 +21,15 @@ public class VersionController {
 
     public VersionController(String path){
         this.path=path;
-        ConvertFolder convertFolder = new ConvertFolder();
-        this.head=new Branch();
+        this.head=null;
+        //当该路径无head文件时，报错；有head文件时，更新head
+        if(!isRepository()){
+            System.out.println("not a git repository");
+            initRepository();
+        }
+        else{
+            this.head=ObjectStore.getHead();
+        }
     }
     /**更新分支commit*/
     public Branch updateHead(TreeObject tree, ObjectStore store){
@@ -32,8 +42,21 @@ public class VersionController {
         }
         return head;
     }
+    /**判断仓库是否存在*/
+    public boolean isRepository(){
+        File reposDir= new File(savePath);
+        if (!reposDir.isDirectory()){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+    /**创建仓库*/
+    public void initRepository(){
+        ObjectStore.saveHead(this.head);
+    }
 
-    //以下是待实现的方法
     /**打印commit日志*/
     public void printLog(){
 
