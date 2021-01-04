@@ -3,13 +3,18 @@ package HWTest;
 public class Branch {
     private final String branchName;
     private String latestCommit;//存储哈希值
-    private final String defaultBranch="main";
+    private static final String defaultBranch="main";
+    private static final String nullCommitHash="0000000000000000000000000000000000000000";
 
     public String getBranchName() {return branchName;}
 
-    public CommitObject getLatestCommit() {return ObjectStore.getCommit(latestCommit);}
+    public CommitObject getLatestCommit() {
+        if(latestCommit==null) return null;
+        return ObjectStore.getCommit(latestCommit);
+    }
 
     public String getCommitHash(){
+        if(latestCommit==null) return nullCommitHash;
         return latestCommit;
     }
 
@@ -20,7 +25,6 @@ public class Branch {
     public Branch() {
         this.branchName = defaultBranch;
         this.latestCommit=null;
-        save();
     }
     /**一般branch构造方法*/
     public Branch(String branchName, CommitObject latestCommit) {

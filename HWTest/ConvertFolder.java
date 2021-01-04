@@ -18,7 +18,7 @@ class ConvertFolder{
         }
     };
 
-    public TreeObject dfs(String path){
+    public static TreeObject dfs(String path){
         File dir = new File(path);
         File[] fs = dir.listFiles();
         Arrays.sort(fs,comparatorFile);
