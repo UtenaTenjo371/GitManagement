@@ -37,7 +37,7 @@ public class SaveObject{
       ObjectInputStream objIn=new ObjectInputStream(in);
       temp=objIn.readObject();
       objIn.close();
-      System.out.println("read object success!");
+      //System.out.println("read object success!");
     } catch (IOException e) {
       System.out.println("read object failed");
       e.printStackTrace();
