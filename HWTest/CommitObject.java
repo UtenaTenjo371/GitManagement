@@ -1,48 +1,65 @@
 package HWTest;
 
 public class CommitObject extends GitObject{
-    private final TreeObject rootTree;
-    private final CommitObject parent;
-    private final CommitObject mergeParent;
+    private final String rootTree;
+    private final String parent;
+    private final String mergeParent;
+//只存各个变量的哈希值，对内存好一点
 
     public TreeObject getRootTree() {
-        return rootTree;
+        return ObjectStore.getTree(rootTree);
     }
 
     public CommitObject getParent() {
-        return parent;
+        return ObjectStore.getCommit(parent);
     }
 
     public CommitObject getMergeParent() {
-        return mergeParent;
+        return ObjectStore.getCommit(mergeParent);
     }
 
-    /** 一般commit的构造方法*/
-    public CommitObject(TreeObject rootTree, CommitObject parent){
-        this.rootTree = rootTree;
-        this.parent = parent;
+    /** 第一次commit的构造方法*/
+    public CommitObject(TreeObject rootTree){
+        rootTree.save();
+        this.rootTree = rootTree.getKey();
+        this.parent = null;
         this.mergeParent=null;
         updateKey(); // 设置key
+        save();
+    }
+    /** 一般commit的构造方法*/
+    public CommitObject(TreeObject rootTree, CommitObject parent){
+        rootTree.save();
+        this.rootTree = rootTree.getKey();
+        parent.save();
+        this.parent = parent.getKey();
+        this.mergeParent=null;
+        updateKey(); // 设置key
+        save();
     }
     /**merge后的commit的构造方法*/
-    public CommitObject(TreeObject rootTree, CommitObject parent,CommitObject mergeParent){
-        this.rootTree = rootTree;
-        this.parent = parent;
-        this.mergeParent=mergeParent;
+    public CommitObject(TreeObject rootTree, CommitObject parent, CommitObject mergeParent){
+        rootTree.save();
+        this.rootTree = rootTree.getKey();
+        parent.save();
+        this.parent = parent.getKey();
+        mergeParent.save();
+        this.mergeParent=mergeParent.getKey();
         updateKey(); // 设置key
+        save();
     }
 
     public String calcKey() {
         CalcHash ch = new CalcHash();
 
-        ch.addString(rootTree.getKey());
+        ch.addString(rootTree);
 
         if(parent != null){
-            ch.addString(parent.getKey());
+            ch.addString(parent);
         }
 
         if(mergeParent != null){
-            ch.addString(mergeParent.getKey());
+            ch.addString(mergeParent);
         }
 
         return ch.getHash();

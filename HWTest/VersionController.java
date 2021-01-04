@@ -3,7 +3,7 @@ package HWTest;
 public class VersionController {
     private final String path;
     private final String sPath;
-    private final Task1 store;
+    private final ObjectStore store;
     private Branch head;
 
 
@@ -24,13 +24,13 @@ public class VersionController {
         this.path=path;
         this.sPath=path+"\\gitSaving";
         System.out.println(sPath);
-        this.store=new Task1(20,sPath);
+        this.store=new ObjectStore();
         ConvertFolder convertFolder = new ConvertFolder();
         TreeObject initTree=convertFolder.dfs(path, store);
         this.head=new Branch("main",new CommitObject(initTree,null));
     }
     /**更新分支commit*/
-    public Branch updateHead(TreeObject tree,Task1 store){
+    public Branch updateHead(TreeObject tree, ObjectStore store){
         //String类型compareTo方法，返回两个string相差的ascii码
         if(head.getLatestCommit()!=null && tree.compareTo(head.getLatestCommit().getRootTree())!=0){
             CommitObject commit=new CommitObject(tree,head.getLatestCommit());

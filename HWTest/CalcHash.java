@@ -3,6 +3,7 @@ package HWTest;
 import java.io.File;
 import java.io.FileInputStream;
 import java.security.MessageDigest;
+import java.util.Vector;
 
 public class CalcHash {
     private MessageDigest complete;
@@ -35,6 +36,12 @@ public class CalcHash {
 
     public void addString(String s) {
         complete.update(s.getBytes());
+    }
+
+    public void addBytes(Vector<byte[]> bv) {
+        for(byte[] b : bv){
+            complete.update(b);
+        }
     }
 
     public String getHash() {
