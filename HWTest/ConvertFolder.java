@@ -18,7 +18,7 @@ class ConvertFolder{
         }
     };
 
-    public TreeObject dfs(String path, ObjectStore a){
+    public TreeObject dfs(String path){
         File dir = new File(path);
         File[] fs = dir.listFiles();
         Arrays.sort(fs,comparatorFile);
@@ -27,11 +27,11 @@ class ConvertFolder{
         for(int i=0;i<fs.length;i++){
             if(fs[i].isFile()){
                 BlobObject blob = new BlobObject(fs[i]);
-                a.add(blob);
+                ObjectStore.add(blob);
                 blobs.add(blob);
             }
             if(fs[i].isDirectory()){
-                TreeObject tree = dfs(path+File.separator+fs[i].getName(), a);
+                TreeObject tree = dfs(path+File.separator+fs[i].getName());
                 trees.add(tree);
             }
         }
@@ -44,7 +44,7 @@ class ConvertFolder{
             trees_array[j] = trees.get(j);
         }
         TreeObject tree = new TreeObject(dir.getName(), blobs_array, trees_array);
-        a.add(tree);
+        ObjectStore.add(tree);
         return tree;
     }
 
@@ -53,12 +53,11 @@ class ConvertFolder{
         Scanner sc = new Scanner(System.in);
         String path = sc.nextLine();
         sc.close();
-        String sPath= path+"\\gitSaving";
 
         VersionController vc=new VersionController(path);
         ObjectStore a = new ObjectStore();
         ConvertFolder convertFolder = new ConvertFolder();
-        TreeObject tree = convertFolder.dfs(path, a);
+        TreeObject tree = convertFolder.dfs(path);
 
         System.out.println(tree.getDirName());
         System.out.println("------------");
@@ -76,6 +75,6 @@ class ConvertFolder{
         //Commit测试
         Branch newHead=vc.updateHead(tree,a);
         System.out.println("------------");
-        System.out.println(newHead.getBranchName()+" "+newHead.getKey());
+        System.out.println(newHead.getBranchName()+" "+newHead);
     }
 }
