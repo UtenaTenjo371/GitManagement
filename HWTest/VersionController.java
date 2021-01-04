@@ -1,11 +1,8 @@
 package HWTest;
 
 public class VersionController {
-    private final String path;
-    private final String sPath;
-    private final ObjectStore store;
-    private Branch head;
-
+    private final String path;//文件夹路径
+    private Branch head;//head指向工作区的branch分支
 
     public String getPath() {
         return path;
@@ -19,15 +16,10 @@ public class VersionController {
         this.head = head;
     }
 
-    //构造时创建main分支(是否需要改成static方法？)
     public VersionController(String path){
         this.path=path;
-        this.sPath=path+"\\gitSaving";
-        System.out.println(sPath);
-        this.store=new ObjectStore();
         ConvertFolder convertFolder = new ConvertFolder();
-        TreeObject initTree=convertFolder.dfs(path, store);
-        this.head=new Branch("main",new CommitObject(initTree,null));
+        this.head=new Branch();
     }
     /**更新分支commit*/
     public Branch updateHead(TreeObject tree, ObjectStore store){

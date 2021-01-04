@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 public class ObjectStore {
 
-    private static final String rootDir=".mygit\\objects";
+    private static final String rootDir=".mygit";
 
     //构造函数，在当前目录的给定路径下存储各个objects
     public ObjectStore(){
@@ -14,24 +14,26 @@ public class ObjectStore {
             dirFile.mkdirs();
         }
     }
-
+    //对tree,blob进行操作
+    /**存储tree,blob*/
     public static String add(GitObject f) {
         String hash = f.getKey();
         //模仿git的存法，上层路径名是hash前两位，文件名是hash后38位
         String dirname = hash.substring(0,2);
         String filename = hash.substring(2);
-        File dirFile = new File(rootDir+"\\"+dirname);
+        //根据gitObject类型，存储到不同位置
+        File dirFile = new File(rootDir+"\\objects\\"+dirname);
         if (!dirFile.isDirectory()){
-            dirFile.mkdir();
+            dirFile.mkdirs();
         }
         SaveObject.writeObjectToFile(dirFile.getPath()+"\\"+filename,f);
         return hash;
     }
-
+    /**获得tree,blob*/
     public static GitObject get(String key) {
         String dirname = key.substring(0,2);
         String filename = key.substring(2);
-        File dirFile = new File(rootDir+"\\"+dirname);
+        File dirFile = new File(rootDir+"\\objects\\"+dirname);
         if (!dirFile.isDirectory()){
             return null;
         }
@@ -49,6 +51,34 @@ public class ObjectStore {
 
     public static CommitObject getCommit(String key){
         return (CommitObject)get(key);
+    }
+    //对branch进行操作
+    /**存储branch*/
+    public static String saveBranch(Branch b) {
+        String filename = b.getBranchName();
+        String hash=b.getCommitHash();
+        File dirFile = new File(rootDir+"\\refs");
+        if (!dirFile.isDirectory()){
+            dirFile.mkdir();
+        }
+        SaveObject.writeObjectToFile(dirFile.getPath()+"\\"+filename,hash);
+        return hash;
+    }
+    /**获取branch*/
+    public static Branch getBranch(String bName){
+        File dirFile = new File(rootDir+"\\refs");
+        if (!dirFile.isFile()){
+            return null;
+        }
+        return (Branch)SaveObject.readObjectFromFile(dirFile.getPath()+"\\"+bName);
+    }
+    /**判断branch是否存在*/
+    public static boolean isBranch(String bName){
+        File dirFile = new File(rootDir+"\\refs");
+        if (!dirFile.isFile()){
+            return false;
+        }
+        return true;
     }
 
 //main用来测试，运行看起来应该是可以的
