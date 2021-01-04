@@ -66,15 +66,15 @@ public class ObjectStore {
     }
     /**获取branch*/
     public static Branch getBranch(String bName){
-        File dirFile = new File(rootDir+"\\refs");
+        File dirFile = new File(rootDir+"\\refs\\"+bName);
         if (!dirFile.isFile()){
             return null;
         }
-        return (Branch)SaveObject.readObjectFromFile(dirFile.getPath()+"\\"+bName);
+        return (Branch)SaveObject.readObjectFromFile(dirFile.getPath());
     }
     /**判断branch是否存在*/
     public static boolean isBranch(String bName){
-        File dirFile = new File(rootDir+"\\refs");
+        File dirFile = new File(rootDir+"\\refs\\"+bName);
         if (!dirFile.isFile()){
             return false;
         }
@@ -83,7 +83,7 @@ public class ObjectStore {
 
 //main用来测试，运行看起来应该是可以的
     public static void main(String[] args) {
-        String dir1 = "F:\\test.txt";
+        /*String dir1 = "F:\\test.txt";
         String dir2 = "F:\\test1.txt";
         File f1 = new File(dir1);
         File f2 = new File(dir2);
@@ -111,8 +111,17 @@ public class ObjectStore {
 
         ObjectStore b=new ObjectStore();
         GitObject gto3 = b.get(hash1);
-        System.out.println(gto3.getKey());
-
+        System.out.println(gto3.getKey());*/
+        //测试branch的存储和读取
+        Branch b=new Branch("main",new CommitObject(ConvertFolder.dfs("D:\\MyFile\\project\\PKU-1stSemester\\Java\\homework")));
+        if(isBranch("main")){
+            System.out.println(b.getBranchName());
+            System.out.println(b.getCommitHash());
+        }
+        CommitObject c=ObjectStore.getCommit(b.getCommitHash());
+        TreeObject t=ObjectStore.getTree(c.getRootTree().getKey());
+        System.out.println(t.getDirName());
+        System.out.println(isBranch("main"));
     }
 }
 
