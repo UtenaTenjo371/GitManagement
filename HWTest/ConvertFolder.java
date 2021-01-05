@@ -73,8 +73,8 @@ class ConvertFolder{
             System.out.println(trees[i].getDirName());
         }
         //Commit测试
-        Branch newHead=vc.updateHead(tree,a);
+        /*Branch newHead=vc.addCommit();
         System.out.println("------------");
-        System.out.println(newHead.getBranchName()+" "+newHead);
+        System.out.println(newHead.getBranchName()+" "+newHead);*/
     }
 }

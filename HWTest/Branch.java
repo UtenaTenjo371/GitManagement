@@ -1,8 +1,11 @@
 package HWTest;
 
-public class Branch {
+import java.io.Serializable;
+
+public class Branch implements  Serializable {
     private final String branchName;
     private String latestCommit;//存储哈希值
+    //常量
     private static final String defaultBranch="main";
     private static final String nullCommitHash="0000000000000000000000000000000000000000";
 
