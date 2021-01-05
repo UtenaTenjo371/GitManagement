@@ -59,9 +59,9 @@ public class ObjectStore {
         String hash=b.getCommitHash();
         File dirFile = new File(rootDir+"\\refs");
         if (!dirFile.isDirectory()){
-            dirFile.mkdir();
+            dirFile.mkdirs();
         }
-        SaveObject.writeObjectToFile(dirFile.getPath()+"\\"+filename,hash);
+        SaveObject.writeObjectToFile(dirFile.getPath()+"\\"+filename,b);
         return hash;
     }
     /**获取branch*/
@@ -81,72 +81,23 @@ public class ObjectStore {
         return true;
     }
     /**存储head*/
-    public static String saveHead(Branch head) {
-        String headName=head.getBranchName();
+    public static String saveHead(String head) {
+        //String headName=head.getBranchName();
         File dirFile = new File(rootDir);
         if (!dirFile.isDirectory()){
             dirFile.mkdir();
         }
-        SaveObject.writeObjectToFile(dirFile.getPath()+"\\HEAD",headName);
-        return headName;
+        SaveObject.writeObjectToFile(dirFile.getPath()+"\\HEAD",head);
+        return head;
     }
     /**获得head*/
-    public static Branch getHead(){
+    public static String getHead(){
         File dirFile = new File(rootDir+"\\HEAD");
         if (!dirFile.isFile()){
             return null;
         }
-        String headBranch=(String)SaveObject.readObjectFromFile(dirFile.getPath());
-        System.out.println(headBranch);
-        Branch head=new Branch();
-        System.out.println(getBranch(headBranch).getBranchName());
-        return head;
-    }
-//main用来测试，运行看起来应该是可以的
-    public static void main(String[] args) {
-        /*String dir1 = "F:\\test.txt";
-        String dir2 = "F:\\test1.txt";
-        File f1 = new File(dir1);
-        File f2 = new File(dir2);
-        BlobObject[] blobs = new BlobObject[2];
-        blobs[0] = new BlobObject(f1);
-        blobs[1] = new BlobObject(f2);
-        TreeObject[] trees = new TreeObject[0];
-        TreeObject tree = new TreeObject("10401206", blobs, trees);
-
-        ObjectStore a = new ObjectStore();
-
-        String hash1 = a.add(blobs[0]);
-        String hash2 = a.add(blobs[1]);
-        String hash3 = a.add(tree);
-
-        GitObject gto1 = a.get(hash3);
-        GitObject gto2 = a.get(hash2);
-
-        System.out.println(hash1);
-        System.out.println(hash2);
-        System.out.println(hash3);
-        System.out.println(gto1.getKey());
-        System.out.println(gto2.getKey());
-
-
-        ObjectStore b=new ObjectStore();
-        GitObject gto3 = b.get(hash1);
-        System.out.println(gto3.getKey());*/
-        //测试branch的存储和读取
-        Branch b=new Branch("main",new CommitObject(ConvertFolder.dfs("D:\\MyFile\\project\\PKU-1stSemester\\Java\\homework")));
-        if(isBranch("main")){
-            System.out.println(b.getBranchName());
-            System.out.println(b.getCommitHash());
-        }
-        CommitObject c=ObjectStore.getCommit(b.getCommitHash());
-        TreeObject t=ObjectStore.getTree(c.getRootTree().getKey());
-        System.out.println(t.getDirName());
-        System.out.println(isBranch("main"));
-        Branch head=new Branch();
-        saveHead(head);
-        isBranch(getHead().getBranchName());
-        //System.out.println(getHead());
+        String branch=(String)SaveObject.readObjectFromFile(dirFile.getPath());
+        return branch;
     }
 }
 
