@@ -21,7 +21,11 @@ public class VersionController {
         this.head="main";
     }
     /**更新分支commit*/
-    public Branch addCommit(){
+    public void addCommit(){
+        if(!checkIfRepository()){
+            System.out.println("not a git repository");
+            return;
+        }
         TreeObject tree=ConvertFolder.dfs(path);
         //String类型compareTo方法，返回两个string相差的ascii码
         Branch current=ObjectStore.getBranch(this.head);
@@ -42,7 +46,6 @@ public class VersionController {
         else{
             System.out.println("No data changes");
         }
-        return current;
     }
 
     /**判断仓库是否存在*/
@@ -94,6 +97,10 @@ public class VersionController {
 
     /**创建分支*/
     public void createBranch(String branchName){
+        if(!checkIfRepository()){
+            System.out.println("not a git repository");
+            return;
+        }
         if(ObjectStore.isBranch(branchName)){
             System.out.print("branch already exists");
             return;
@@ -104,6 +111,10 @@ public class VersionController {
 
     /**切换分支*/
     public void switchToBranch(String branchName){
+        if(!checkIfRepository()){
+            System.out.println("not a git repository");
+            return;
+        }
         head=branchName;
         Branch target=ObjectStore.getBranch(branchName);
         ObjectStore.saveHead(head);
@@ -112,6 +123,10 @@ public class VersionController {
 
     /**打印分支*/
     public void printBranch(){
+        if(!checkIfRepository()){
+            System.out.println("not a git repository");
+            return;
+        }
         Vector<Branch> branches=ObjectStore.getAllBranch();
         for(int i=0;i<branches.size();i++) {
             if(branches.get(i).getBranchName().equals(ObjectStore.getHead())){
@@ -160,7 +175,6 @@ public class VersionController {
                 else
                     versionController.switchToBranch(args[1]);
             case "commit" :
-                if(versionController.checkIfRepository())
                     versionController.addCommit();
                 break;
             case "log" :
