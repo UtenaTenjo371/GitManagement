@@ -15,8 +15,8 @@ public class ObjectStore {
             dirFile.mkdirs();
         }
     }
-    //对tree,blob进行操作
-    /**存储tree,blob*/
+    //对gitObject进行操作
+    /**存储gitObject*/
     public static String add(GitObject f) {
         String hash = f.getKey();
         //模仿git的存法，上层路径名是hash前两位，文件名是hash后38位
@@ -30,7 +30,7 @@ public class ObjectStore {
         SaveObject.writeObjectToFile(dirFile.getPath()+"\\"+filename,f);
         return hash;
     }
-    /**获得tree,blob*/
+    /**获得gitObject*/
     public static GitObject get(String key) {
         String dirname = key.substring(0,2);
         String filename = key.substring(2);
@@ -39,6 +39,17 @@ public class ObjectStore {
             return null;
         }
         return (GitObject)SaveObject.readObjectFromFile(dirFile.getPath()+"\\"+filename);
+    }
+    /**删除gitObject*/
+    public static String delete(GitObject f) {
+        String hash = f.getKey();
+        //模仿git的存法，上层路径名是hash前两位，文件名是hash后38位
+        String dirname = hash.substring(0,2);
+        String filename = hash.substring(2);
+        //根据gitObject类型，存储到不同位置
+        File dirFile = new File(rootDir+"\\objects\\"+dirname);
+        dirFile.delete();
+        return hash;
     }
 
     //对应返回不同种类的GitObject的get方法
@@ -109,6 +120,15 @@ public class ObjectStore {
             br.addElement((Branch)SaveObject.readObjectFromFile(fs[i].getPath()));
         }
         return br;
+    }
+    /**删除branch*/
+    public static boolean deleteBranch(String bName){
+        File dirFile = new File(rootDir+"\\refs\\"+bName);
+        if (!dirFile.isFile()){
+            return false;
+        }
+        dirFile.delete();
+        return true;
     }
 }
 
