@@ -24,6 +24,10 @@ public class Branch implements  Serializable {
     public void setLatestCommit(CommitObject latestCommit) {
         this.latestCommit = latestCommit.getKey();
     }
+    public void setLatestCommit(String commitKey) {
+        this.latestCommit = commitKey;
+    }
+
     /**branch:main构造方法*/
     public Branch() {
         this.branchName = defaultBranch;

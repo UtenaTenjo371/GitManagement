@@ -1,9 +1,6 @@
 package HWTest;
 
-import com.sun.source.tree.Tree;
-
 import java.io.File;
-import java.sql.Blob;
 import java.util.*;
 
 class ConvertFolder{

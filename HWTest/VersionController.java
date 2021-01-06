@@ -20,6 +20,9 @@ public class VersionController {
         this.path=path;
         this.head="main";
     }
+
+    /**添加文件到暂存区*/
+
     /**更新分支commit*/
     public void addCommit(){
         if(!checkIfRepository()){
@@ -92,7 +95,16 @@ public class VersionController {
 
     /**回溯到commit*/
     public void resetCommit(String commitKey){
-
+        if(!checkIfRepository()){
+            System.out.println("not a git repository");
+            return;
+        }
+        Branch branch = ObjectStore.getBranch(head);
+        branch.setLatestCommit(commitKey);
+        // --hard
+        changeToCommit(commitKey);
+        // --soft
+        // --mixed
     }
 
     /**创建分支*/
@@ -180,7 +192,7 @@ public class VersionController {
             case "log" :
                 //语句
                 break;
-            case "revert" :
+            case "reset" :
                 //语句
                 break;
             default :
