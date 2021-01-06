@@ -3,6 +3,7 @@ package HWTest;
 import com.sun.source.tree.Tree;
 
 import java.io.File;
+import java.util.Vector;
 
 public class VersionController {
     private final String path;//文件夹路径
@@ -90,16 +91,29 @@ public class VersionController {
     public void switchToBranch(String branchName){
         head=branchName;
         Branch target=ObjectStore.getBranch(branchName);
+        ObjectStore.saveHead(head);
         changeFile(target.getCommitHash());
+    }
+
+    /**打印分支*/
+    public void printBranch(){
+        Vector<Branch> branches=ObjectStore.getAllBranch();
+        for(int i=0;i<branches.size();i++) {
+            if(branches.get(i).getBranchName().equals(ObjectStore.getHead())){
+                System.out.print("*");
+            }else{
+                System.out.print("-");
+            }
+            System.out.println(branches.get(i).getBranchName());
+        }
     }
 
     /**合并分支*/
     public void mergeBranch(Branch branch1,Branch branch2){
 
     }
-
     /**恢复文件到指定版本*/
     public void changeFile(String cHash){
-
+        System.out.println("ChangeFile");
     }
 }

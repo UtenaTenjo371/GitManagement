@@ -2,6 +2,7 @@ package HWTest;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.Vector;
 
 public class ObjectStore {
 
@@ -98,6 +99,16 @@ public class ObjectStore {
         }
         String branch=(String)SaveObject.readObjectFromFile(dirFile.getPath());
         return branch;
+    }
+    /**获得所有branch*/
+    public static Vector<Branch> getAllBranch(){
+        Vector<Branch> br=new Vector<Branch>();
+        File dir = new File(rootDir+"\\refs");
+        File[] fs = dir.listFiles();
+        for(int i=0;i<fs.length;i++) {
+            br.addElement((Branch)SaveObject.readObjectFromFile(fs[i].getPath()));
+        }
+        return br;
     }
 }
 
