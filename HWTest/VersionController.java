@@ -175,7 +175,7 @@ public class VersionController {
                 else
                     versionController.switchToBranch(args[1]);
             case "commit" :
-                    versionController.addCommit();
+                versionController.addCommit();
                 break;
             case "log" :
                 //语句
