@@ -107,6 +107,11 @@ public class VersionController {
             System.out.println(branches.get(i).getBranchName());
         }
     }
+    /**删除分支*/
+    public boolean deleteBranch(String branchName){
+        if(branchName=="main") return false;
+        return ObjectStore.deleteBranch(branchName);
+    }
 
     /**合并分支*/
     public void mergeBranch(Branch branch1,Branch branch2){
