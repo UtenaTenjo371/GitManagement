@@ -83,6 +83,7 @@ public class VersionController {
 
     /**创建分支*/
     public void createBranch(String branchName){
+        if(ObjectStore.isBranch(branchName)) return;
         Branch branch= new Branch(branchName,ObjectStore.getBranch(head).getLatestCommit());
         branch.save();
     }
@@ -92,7 +93,7 @@ public class VersionController {
         head=branchName;
         Branch target=ObjectStore.getBranch(branchName);
         ObjectStore.saveHead(head);
-        changeFile(target.getCommitHash());
+        changeToCommit(target.getCommitHash());
     }
 
     /**打印分支*/
@@ -112,13 +113,13 @@ public class VersionController {
         if(branchName=="main") return false;
         return ObjectStore.deleteBranch(branchName);
     }
-
+    /**恢复文件到指定版本*/
+    public void changeToCommit(String cHash){
+        CommitObject commit=ObjectStore.getCommit(cHash);
+        ConvertFolder.changeFile(path,commit.getRootTree());
+    }
     /**合并分支*/
     public void mergeBranch(Branch branch1,Branch branch2){
 
-    }
-    /**恢复文件到指定版本*/
-    public void changeFile(String cHash){
-        System.out.println("ChangeFile");
     }
 }
