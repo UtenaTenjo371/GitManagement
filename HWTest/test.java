@@ -21,8 +21,11 @@ public class test {
         //测试add commit
         VersionController vc=new VersionController("D:\\MyFile\\project\\PKU-1stSemester\\Java\\repository");
         vc.addCommit();
-        Branch branch=ObjectStore.getBranch(vc.getHead());
-        System.out.println(branch.getLatestCommit().getKey());
+        vc.createBranch("Imfine");
+        vc.createBranch("Imdead");
+        vc.printBranch();
+        vc.switchToBranch("Imfine");
+        vc.printBranch();
         //Branch current=ObjectStore.getBranch(vc.getHead());
         //TreeObject tree=ConvertFolder.dfs(vc.getPath());
         //System.out.println(current.getBranchName());
