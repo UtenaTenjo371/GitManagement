@@ -1,7 +1,5 @@
 package HWTest;
 
-import com.sun.source.tree.Tree;
-
 import java.io.File;
 import java.util.Vector;
 
@@ -21,14 +19,6 @@ public class VersionController {
     public VersionController(String path){
         this.path=path;
         this.head="main";
-        //当该路径无head文件时，创建仓库；有head文件时，更新head
-        if(!isRepository()){
-            System.out.println("not a git repository");
-            initRepository();
-        }
-        else{
-            this.head=ObjectStore.getHead();
-        }
     }
     /**更新分支commit*/
     public Branch addCommit(){
@@ -54,6 +44,7 @@ public class VersionController {
         }
         return current;
     }
+
     /**判断仓库是否存在*/
     public boolean isRepository(){
         File reposDir= new File(savePath);
@@ -64,11 +55,31 @@ public class VersionController {
             return true;
         }
     }
+
+    /**执行git操作前，判断当前路径是否为仓库，并做相应的准备工作*/
+    public boolean checkIfRepository(){
+        //当该路径无head文件时，返回仓库不存在提示；有head文件时，更新head
+        if(!isRepository()){
+            System.out.println("not a git repository");
+            return false;
+        }
+        else {
+            this.head=ObjectStore.getHead();
+            return true;
+        }
+    }
+
     /**创建仓库*/
     public void initRepository(){
-        Branch b=new Branch();
-        b.save();
-        ObjectStore.saveHead(this.head);
+        if(!isRepository()){
+            Branch b=new Branch();
+            b.save();
+            ObjectStore.saveHead(this.head);
+            System.out.println("initialized a repository");
+        }
+        else{
+            System.out.println("repository already exists");
+        }
     }
 
     /**打印commit日志*/
@@ -83,6 +94,13 @@ public class VersionController {
 
     /**创建分支*/
     public void createBranch(String branchName){
+        Vector<Branch> branches=ObjectStore.getAllBranch();
+        for(int i=0;i<branches.size();i++) {
+            if(branches.get(i).getBranchName().equals(branchName)){
+                System.out.print("branch already exists");
+                return;
+            }
+        }
         Branch branch= new Branch(branchName,ObjectStore.getBranch(head).getLatestCommit());
         branch.save();
     }
@@ -120,5 +138,42 @@ public class VersionController {
     /**恢复文件到指定版本*/
     public void changeFile(String cHash){
         System.out.println("ChangeFile");
+    }
+
+    /**支持命令行操作*/
+    public static void main(String[] args) {
+        if(args.length < 1)
+            return;
+
+        VersionController versionController = new VersionController(System.getProperty("user.dir"));
+
+        switch(args[0]){
+            case "init" :
+                versionController.initRepository();
+                break;
+            case "branch" :
+                if(args.length == 1)
+                    versionController.printBranch();
+                else
+                    versionController.createBranch(args[1]);
+                break;
+            case "checkout" :
+                if(args.length < 2)
+                    System.out.println("invalid input");
+                else
+                    versionController.switchToBranch(args[1]);
+            case "commit" :
+                if(versionController.checkIfRepository())
+                    versionController.addCommit();
+                break;
+            case "log" :
+                //语句
+                break;
+            case "revert" :
+                //语句
+                break;
+            default :
+                return;
+        }
     }
 }
