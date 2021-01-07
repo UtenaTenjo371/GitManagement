@@ -19,9 +19,9 @@ public class test {
         System.out.println(ObjectStore.getHead());
         //System.out.println(getHead());*/
         //测试add commit
-        VersionController vc=new VersionController("D:\\MyFile\\project\\PKU-1stSemester\\Java\\repository");
+        // VersionController vc=new VersionController("D:\\MyFile\\project\\PKU-1stSemester\\Java\\repository");
         //vc.addCommit();
-        vc.changeToCommit("cd6f0ee0bf9f0ac7854dbfb6d48e012c14e0837d");
+        // vc.changeToCommit("cd6f0ee0bf9f0ac7854dbfb6d48e012c14e0837d");
 
         //Branch current=ObjectStore.getBranch(vc.getHead());
         //TreeObject tree=ConvertFolder.dfs(vc.getPath());

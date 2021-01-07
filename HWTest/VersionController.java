@@ -9,6 +9,7 @@ public class VersionController {
     private String head;//head指向工作区的branch分支
     private String savePath=".mygit";
     private GitLog gitlog;
+    private Stage stage = new Stage();
 
     public String getPath() {
         return path;
@@ -18,21 +19,24 @@ public class VersionController {
         return head;
     }
 
-    public VersionController(String path){
+    public VersionController(String path) throws IOException {
         this.path=path;
         this.head="main";
         this.gitlog = new GitLog();
     }
 
     /**添加文件到暂存区*/
+    public void addFile(GitObject gitObject) throws IOException {
+        stage.addToIndex(gitObject.getKey());
+    }
 
     /**更新分支commit*/
-    public void addCommit(String commitMessage){
+    public void addCommit(String commitMessage) throws IOException {
         if(!checkIfRepository()){
             System.out.println("not a git repository");
             return;
         }
-        TreeObject tree=ConvertFolder.dfs(path);
+        TreeObject tree=ConvertFolder.dfs(path, stage);
         //String类型compareTo方法，返回两个string相差的ascii码
         Branch current=ObjectStore.getBranch(this.head);
         if(current.getLatestCommit()==null){
@@ -117,7 +121,7 @@ public class VersionController {
     }
 
     /**创建分支*/
-    public void createBranch(String branchName){
+    public void createBranch(String branchName) throws IOException {
         if(!checkIfRepository()){
             System.out.println("not a git repository");
             return;
@@ -132,7 +136,7 @@ public class VersionController {
     }
 
     /**切换分支*/
-    public void switchToBranch(String branchName){
+    public void switchToBranch(String branchName) throws IOException {
         if(!checkIfRepository()){
             System.out.println("not a git repository");
             return;
@@ -166,9 +170,9 @@ public class VersionController {
         return ObjectStore.deleteBranch(branchName);
     }
     /**恢复文件到指定版本*/
-    public void changeToCommit(String cHash){
+    public void changeToCommit(String cHash) throws IOException {
         CommitObject commit=ObjectStore.getCommit(cHash);
-        ConvertFolder.changeFile(path,commit.getRootTree());
+        ConvertFolder.changeFile(path,commit.getRootTree(), stage);
     }
     /**合并分支*/
     public void mergeBranch(Branch branch1,Branch branch2){
