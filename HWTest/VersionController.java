@@ -1,69 +1,219 @@
 package HWTest;
 
-public class VersionController {
-    private final String path;
-    private final String sPath;
-    private final ObjectStore store;
-    private Branch head;
+import java.io.File;
+import java.io.IOException;
+import java.util.Vector;
 
+public class VersionController {
+    private final String path;//文件夹路径
+    private String head;//head指向工作区的branch分支
+    private String savePath=".mygit";
+    private GitLog gitlog;
 
     public String getPath() {
         return path;
     }
 
-    public Branch getHead() {
+    public String getHead() {
         return head;
     }
 
-    public void setHead(Branch head) {
-        this.head = head;
-    }
-
-    //构造时创建main分支(是否需要改成static方法？)
     public VersionController(String path){
         this.path=path;
-        this.sPath=path+"\\gitSaving";
-        System.out.println(sPath);
-        this.store=new ObjectStore();
-        ConvertFolder convertFolder = new ConvertFolder();
-        TreeObject initTree=convertFolder.dfs(path, store);
-        this.head=new Branch("main",new CommitObject(initTree,null));
-    }
-    /**更新分支commit*/
-    public Branch updateHead(TreeObject tree, ObjectStore store){
-        //String类型compareTo方法，返回两个string相差的ascii码
-        if(head.getLatestCommit()!=null && tree.compareTo(head.getLatestCommit().getRootTree())!=0){
-            CommitObject commit=new CommitObject(tree,head.getLatestCommit());
-            head.setLatestCommit(commit);
-            //存储新的commit，之后应添加存储branch,head也要存储
-            store.add(commit);
-        }
-        return head;
+        this.head="main";
+        this.gitlog = new GitLog();
     }
 
-    //以下是待实现的方法
+    /**添加文件到暂存区*/
+
+    /**更新分支commit*/
+    public void addCommit(String commitMessage){
+        if(!checkIfRepository()){
+            System.out.println("not a git repository");
+            return;
+        }
+        TreeObject tree=ConvertFolder.dfs(path);
+        //String类型compareTo方法，返回两个string相差的ascii码
+        Branch current=ObjectStore.getBranch(this.head);
+        if(current.getLatestCommit()==null){
+            CommitObject commit=new CommitObject(tree);
+            commit.setComment(commitMessage);
+            commit.save();
+            current.setLatestCommit(commit);
+            current.save();
+            gitlog.add(commit);
+            System.out.println("add commit successfully"+" "+commit.getKey());
+        }
+        else if(current.getLatestCommit()!=null && tree.compareTo(current.getLatestCommit().getRootTree())!=0){
+            CommitObject commit=new CommitObject(tree,current.getLatestCommit());
+            commit.setComment(commitMessage);
+            commit.save();
+            current.setLatestCommit(commit);
+            current.save();
+            gitlog.add(commit);
+            System.out.println("add commit successfully"+" "+commit.getKey());
+        }
+        else{
+            System.out.println("No data changes");
+        }
+    }
+
+    /**判断仓库是否存在*/
+    public boolean isRepository(){
+        File reposDir= new File(savePath);
+        if (!reposDir.isDirectory()){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+
+    /**执行git操作前，判断当前路径是否为仓库，并做相应的准备工作*/
+    public boolean checkIfRepository(){
+        //当该路径无head文件时，返回仓库不存在提示；有head文件时，更新head
+        if(!isRepository()){
+            System.out.println("not a git repository");
+            return false;
+        }
+        else {
+            this.head=ObjectStore.getHead();
+            return true;
+        }
+    }
+
+    /**创建仓库*/
+    public void initRepository(){
+        if(!isRepository()){
+            Branch b=new Branch();
+            b.save();
+            ObjectStore.saveHead(this.head);
+            gitlog.iniGitLog();
+            System.out.println("initialized a repository");
+        }
+        else{
+            System.out.println("repository already exists");
+        }
+    }
+
     /**打印commit日志*/
     public void printLog(){
-
+        System.out.println(gitlog.getAll());
     }
 
     /**回溯到commit*/
-    public void resetCommit(String commitKey){
-
+    public void resetCommit(String commitKey) throws IOException {
+        if(!checkIfRepository()){
+            System.out.println("not a git repository");
+            return;
+        }
+        Branch branch = ObjectStore.getBranch(head);
+        branch.setLatestCommit(commitKey);
+        gitlog.updateLogAfterReset(commitKey);
+        // --hard
+        changeToCommit(commitKey);
+        // --soft
+        // --mixed
     }
 
     /**创建分支*/
     public void createBranch(String branchName){
-
+        if(!checkIfRepository()){
+            System.out.println("not a git repository");
+            return;
+        }
+        if(ObjectStore.isBranch(branchName)){
+            System.out.print("branch already exists");
+            return;
+        }
+        Branch branch= new Branch(branchName,ObjectStore.getBranch(head).getLatestCommit());
+        branch.save();
+        switchToBranch(branchName);
     }
 
     /**切换分支*/
     public void switchToBranch(String branchName){
-
+        if(!checkIfRepository()){
+            System.out.println("not a git repository");
+            return;
+        }
+        gitlog.switchBranchLog(head, branchName);
+        head=branchName;
+        Branch target=ObjectStore.getBranch(branchName);
+        ObjectStore.saveHead(head);
+        changeToCommit(target.getCommitHash());
     }
 
+    /**打印分支*/
+    public void printBranch(){
+        if(!checkIfRepository()){
+            System.out.println("not a git repository");
+            return;
+        }
+        Vector<Branch> branches=ObjectStore.getAllBranch();
+        for(int i=0;i<branches.size();i++) {
+            if(branches.get(i).getBranchName().equals(ObjectStore.getHead())){
+                System.out.print("*");
+            }else{
+                System.out.print("-");
+            }
+            System.out.println(branches.get(i).getBranchName());
+        }
+    }
+    /**删除分支*/
+    public boolean deleteBranch(String branchName){
+        if(branchName=="main") return false;
+        return ObjectStore.deleteBranch(branchName);
+    }
+    /**恢复文件到指定版本*/
+    public void changeToCommit(String cHash){
+        CommitObject commit=ObjectStore.getCommit(cHash);
+        ConvertFolder.changeFile(path,commit.getRootTree());
+    }
     /**合并分支*/
     public void mergeBranch(Branch branch1,Branch branch2){
 
+    }
+
+    /**支持命令行操作*/
+    public static void main(String[] args) throws IOException {
+        if(args.length < 1)
+            return;
+
+        VersionController versionController = new VersionController(System.getProperty("user.dir"));
+
+        switch(args[0]){
+            case "init" : // git init
+                versionController.initRepository();
+                break;
+            case "branch" :
+                if(args.length == 1) // git branch
+                    versionController.printBranch();
+                else
+                    versionController.createBranch(args[1]); // git branch branchname
+                break;
+            case "checkout" : // git checkout branchname
+                if(args.length < 2)
+                    System.out.println("invalid input");
+                else
+                    versionController.switchToBranch(args[1]);
+            case "commit" : // git commit -m "Commit message"
+                if(args.length < 3)
+                    System.out.println("invalid input");
+                else
+                    versionController.addCommit(args[2]);
+                break;
+            case "log" : // git log
+                versionController.printLog();
+                break;
+            case "reset" :
+                if(args.length < 2)
+                    System.out.println("invalid input");
+                else
+                    versionController.resetCommit(args[1]);
+                break;
+            default :
+                return;
+        }
     }
 }

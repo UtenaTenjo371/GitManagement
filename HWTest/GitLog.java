@@ -15,28 +15,14 @@ public class GitLog {
     //理论上还要实现branch,reset,checkout，不过现在还都没有
 
     private static final String rootDir=".mygit\\logs";
-    private final String logDir;
+    private final String logDir = rootDir + "\\" + "HEAD";
 
-    //构造函数，默认存储HEAD
-    public GitLog(){
-        this("HEAD");
-    }
+    public GitLog(){}
 
-    //构造函数，给定存储的绝对路径，确认需要存储文件的上层文件夹存在
-    public GitLog(String logDir){
-        int index =-1;
-        for (int i=0;i<logDir.length();i++){
-            if (logDir.charAt(i)=='\\') index=i;
-        }
-        String subDir= rootDir;
-        if (index!=-1) {
-            subDir += "\\"+logDir.substring(0,index);
-        }
-        File subfile = new File(subDir);
-        if (!subfile.isDirectory()){
-            subfile.mkdirs();
-        }
-        this.logDir = rootDir+"\\"+logDir;
+    public void iniGitLog(){
+        File file=new File(rootDir + "\\refs\\heads");
+        if(!file.exists())//如果文件夹不存在
+            file.mkdirs();//创建文件夹
     }
 
     public String add(CommitObject co) {
@@ -69,6 +55,25 @@ public class GitLog {
         return SaveString.readStringFromFile(logDir, 0);
     }
 
+    public String getBranchAll(String branchName){
+        String branchLogPath = rootDir + "\\refs\\heads\\" + branchName;
+        return SaveString.readStringFromFile(branchLogPath, 0);
+    }
+
+    /**切换分区时，切换log*/
+    public void switchBranchLog(String currentHead, String desBranchName){
+        String branchLogPath = rootDir + "\\refs\\heads\\" + currentHead;
+        String currentHeadLog = get();
+        SaveString.overwriteStringToFile(branchLogPath, currentHeadLog);
+        String src = getBranchAll(desBranchName);
+        SaveString.overwriteStringToFile(logDir, src);
+    }
+
+    /**reset后，更新log*/
+    public void updateLogAfterReset(String commitKey) throws IOException {
+        SaveString.deleteContentAfterKeyword(logDir, commitKey);
+    }
+
     public static void main(String[] args){
         ObjectStore a = new ObjectStore();
 
@@ -95,6 +100,5 @@ public class GitLog {
         System.out.println(res);
         System.out.println(resAll);
     }
-
 }
 

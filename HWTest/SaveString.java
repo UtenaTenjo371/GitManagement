@@ -59,7 +59,7 @@ public class SaveString {
         return result.toString();
     }
 
-    // 覆写文件，只写一行的写法
+    // 覆写文件
     public static void overwriteStringToFile(String fileDir,String content)
     {
         File file =new File(fileDir);
@@ -67,7 +67,6 @@ public class SaveString {
         try {
             out = new FileOutputStream(file);
             out.write(content.getBytes());
-            out.write('\n');
             out.flush();
             out.close();
             //System.out.println("write object success!");
@@ -75,5 +74,40 @@ public class SaveString {
             //System.out.println("write object failed");
             e.printStackTrace();
         }
+    }
+
+    /**删除文件中含有指定关键字之后的内容*/
+    public static void deleteContentAfterKeyword(String oldFilepath, String keyword) throws IOException {
+        File file = new File(oldFilepath);
+        BufferedReader reader = null;
+        File tempFile = new File(file.getPath() + "_temp");
+        FileWriter fw=new FileWriter(tempFile);
+        BufferedWriter  bw=new BufferedWriter(fw);
+        try {
+            // System.out.println("以行为单位读取文件内容，一次读一整行：");
+            reader = new BufferedReader(new FileReader(file));
+            String tempString = null;
+            int line = 1;
+            // 一次读入一行，直到读入null为文件结束
+            while ((tempString = reader.readLine()) != null) {
+                if (tempString.toLowerCase().contains(keyword.toLowerCase()))
+                    break;
+                bw.write(tempString+"\n");
+            }
+            reader.close();
+            bw.close();
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e1) {
+                }
+            }
+        }
+        file.delete();
+        tempFile.renameTo(new File(oldFilepath));
     }
 }

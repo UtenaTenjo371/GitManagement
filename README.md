@@ -4,17 +4,17 @@
 ## 项目说明
 #### 层次图
 
-![GitManage](https://raw.githubusercontent.com/UtenaTenjo371/GitManagement/zjq/3-Task3-Commit/Docs/Img/GitManage.png)
+![GitManage](C:\Users\29574\Downloads\GitManage.png)
 
 #### Commit管理
 
 UML类图
 
-![GitManage (3)](https://raw.githubusercontent.com/UtenaTenjo371/GitManagement/zjq/3-Task3-Commit/Docs/Img/GitManage%20(3).png)
+![UML类图](C:\Users\29574\Pictures\Saved Pictures\GitManage (3).png)
 
 Commit结构示意图
 
-![Commit结构](https://raw.githubusercontent.com/UtenaTenjo371/GitManagement/zjq/3-Task3-Commit/Docs/Img/GitManage%20(5).png)
+![Commit结构](C:\Users\29574\Downloads\GitManage (5).png)
 
 每个commit都是一个CommitObject，Commit对象分为三种，根结点commit对象没有parent，一般commit对象有一个parent，merge后的commit对象有两个parent。
 
