@@ -6,13 +6,12 @@ import java.util.Date;
 public class GitLog {
     /*
     现有命令行交互：
-    每条commit都有log
+    每条commit都对应一条log
     commit hash
-    author //这个我们没有
-    date(日期与时区) //这个我不会译
-    注释
+    author
+    date(日期与时区)
+    提交时的注释
      */
-    //理论上还要实现branch,reset,checkout，不过现在还都没有
 
     private static final String rootDir=".mygit\\logs";
     private final String logDir = rootDir + "\\" + "HEAD";
@@ -36,22 +35,52 @@ public class GitLog {
         if(parent != null){
             parenthash = co.getParent().getKey();
         }
-
         //记录注释
         String comment = co.getComment();
 
         String log = parenthash+" "+hash+" "+millsec+" commit: "+comment;
         SaveString.writeStringToFile(logDir, log);
         return log;
-
     }
+/*
+由于根据最初的ppt中要求，只需进行命令行查看commit历史，因此当前直接使用logs下的HEAD文件存储当前分支下的commit记录。
+实际上.git的log里HEAD文件是存储所有的操作记录日志的，包括创建、切换分支等等。目前暂未实现。
+
+    public String add(Branch br){
+        Date dateCreated=new Date();
+        //从1970年到现在的秒数
+        long millsec = dateCreated.getTime();
+        //记录当前branch的key
+        String hash = br.getCommitHash();
+        //记录注释
+        String comment = "Reset to "+br.getBranchName();
+        String log = hash+" "+hash+" "+millsec+" branch: "+comment;
+        SaveString.writeStringToFile(logDir, log);
+        return log;
+    }
+
+    public String add(String currenthead, Branch br){
+        Date dateCreated=new Date();
+        //从1970年到现在的秒数
+        long millsec = dateCreated.getTime();
+        //记录当前branch的key
+        String currenthash= ObjectStore.getBranch(currenthead).getCommitHash();
+        //记录切换后branch的key
+        String hash = br.getCommitHash();
+        //记录注释
+        String comment = "Reset to "+br.getBranchName();
+        String log = hash+" "+hash+" "+millsec+" branch: "+comment;
+        SaveString.writeStringToFile(logDir, log);
+        return log;
+    }
+
+ */
 
     public String get() {
         return SaveString.readStringFromFile(logDir, -1);
     }
 
     public String getAll(){
-        //理论上好像得把日期翻译一下但我不会。。。。。
         return SaveString.readStringFromFile(logDir, 0);
     }
 
@@ -60,7 +89,7 @@ public class GitLog {
         return SaveString.readStringFromFile(branchLogPath, 0);
     }
 
-    /**切换分区时，切换log*/
+    /**切换分支时，切换log*/
     public void switchBranchLog(String currentHead, String desBranchName){
         String branchLogPath = rootDir + "\\refs\\heads\\" + currentHead;
         String currentHeadLog = get();
