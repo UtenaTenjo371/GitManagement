@@ -1,4 +1,4 @@
-## Task1任务
+## Key-Value功能 (Task1)
 
 最简单的key-value存储方式
 
@@ -12,11 +12,9 @@
 
 封装成class对外提供接口
 
-单元测试
-
 ### Class ObjectStore
 
-提供Task1所需的功能。
+提供Key-Value存储所需的功能。
 
 变量（静态，不变。指定存储路径为当前文件夹下的.mygit\\objects）：
 
@@ -34,14 +32,37 @@ public ObjectStore() 构造时检查所需存储路径是否存在，不存在�
 方法（静态）：
 
 ```
-给定value，向存储中添加对应的key-value。调用saveObject，直接向磁盘中存入文件，仿照git的存法在存储路径下新建文件夹和文件，文件夹和文件名分别为hash值的前2位和后38位。
-	public static String add(GitObject f) 
-
-给定key，查找得到对应的value值。调用saveObject，按照hash值从磁盘中找相应的文件，根据文件夹和文件命名寻找。
-	public static GitObject get(String key)
+Key-Value存储的基本方法：
+    给定value，向存储中添加对应的key-value。调用saveObject，直接向磁盘中存入文件，仿照git的存法在存储路径下新建文件夹和文件，文件夹和文件名分别为hash值的前2位和后38位。
+        public static String add(GitObject f) 
+    给定key，查找得到对应的value值。调用saveObject，按照hash值从磁盘中找相应的文件，根据文件夹和文件命名寻找。
+        public static GitObject get(String key)
+    删除GitObject的方法
+        public static String delete(GitObject f) 
+	
+对应返回不同种类的GitObject的get方法：
+    public static BlobObject getBlob(String key)
+    public static TreeObject getTree(String key)
+    public static CommitObject getCommit(String key)
+    
+对branch进行操作的方法：
+    存储branch，返回branch最近一次commit的hash值
+    	public static String saveBranch(Branch b)
+    根据分支名获取branch对象
+    	public static Branch getBranch(String bName)
+    判断branch是否存在
+    	public static boolean isBranch(String bName)
+    存储指向工作区branch的head
+    	public static String saveHead(String head)
+    获得head
+    	public static String getHead()
+    获得所有branch
+    	public static Vector<Branch> getAllBranch()
+    删除branch
+    	public static boolean deleteBranch(String bName)
 ```
 
-#### Class saveObject
+#### Class SaveObject
 
 用于完成以二进制方式存储到磁盘的功能。
 
@@ -67,7 +88,7 @@ public ObjectStore() 构造时检查所需存储路径是否存在，不存在�
 检查文件本身是否已经存储
 	private boolean isSaved = false;
 
-实现Serializable接口需要的ID（以便被存到磁盘）
+实现Serializable接口需要的ID（以序列化存储到磁盘）
 	private static final long serialVersionUID =9876543212345L;
 ```
 
