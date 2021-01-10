@@ -131,8 +131,6 @@ public class VersionController {
         gitlog.updateLogAfterReset(commitKey);
         // --hard
         changeToCommit(commitKey);
-        // --soft
-        // --mixed
     }
 
     /**创建分支*/
@@ -187,7 +185,7 @@ public class VersionController {
     /**恢复文件到指定版本*/
     public void changeToCommit(String cHash) throws IOException {
         CommitObject commit=ObjectStore.getCommit(cHash);
-        ConvertFolder.changeFile(path,commit.getRootTree(), stage);
+        ConvertFolder.changeFile(path,commit.getRootTree(), stage, 0);
     }
     /**合并分支*/
     public void mergeBranch(Branch branch1,Branch branch2){

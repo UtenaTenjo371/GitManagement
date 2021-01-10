@@ -91,10 +91,13 @@ public class GitLog {
     }
 
     /**切换分支时，切换log*/
-    public void switchBranchLog(String currentHead, String desBranchName){
+    public void switchBranchLog(String currentHead, String desBranchName) throws IOException {
         String branchLogPath = rootDir + "\\refs\\heads\\" + currentHead;
         String currentHeadLog = get();
         SaveString.overwriteStringToFile(branchLogPath, currentHeadLog);
+        File file = new File(desBranchName);
+        if(file.isFile())
+            file.createNewFile();
         String src = getBranchAll(desBranchName);
         SaveString.overwriteStringToFile(logDir, src);
     }

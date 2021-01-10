@@ -11,6 +11,11 @@ public class test {
         versionController.initRepository();
     }
 
+    @Test
+    void testDeleteContentAfterKeyword() throws IOException {
+        SaveString.deleteContentAfterKeyword("F:\\20Java\\testgit\\test.txt", "abc");
+    }
+
     public static void main(String[] args) {
         //测试branch的存储和读取
         /*Branch b=new Branch("main",new CommitObject(ConvertFolder.dfs("D:\\MyFile\\project\\PKU-1stSemester\\Java\\homework")));

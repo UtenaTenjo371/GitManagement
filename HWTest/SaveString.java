@@ -88,11 +88,15 @@ public class SaveString {
             // System.out.println("以行为单位读取文件内容，一次读一整行：");
             reader = new BufferedReader(new FileReader(file));
             String tempString = null;
-            int line = 1;
+            int flag = 0;
             // 一次读入一行，直到读入null为文件结束
             while ((tempString = reader.readLine()) != null) {
-                if (tempString.toLowerCase().contains(keyword.toLowerCase()))
+                if(flag == 1){
                     break;
+                }
+                if (tempString.toLowerCase().contains(keyword.toLowerCase())){
+                    flag = 1;
+                }
                 bw.write(tempString+"\n");
             }
             reader.close();
