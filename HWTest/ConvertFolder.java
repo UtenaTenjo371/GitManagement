@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.*;
 
 class ConvertFolder{
+    // File比较器
     public static Comparator<File> comparatorFile =new Comparator <File>(){
         public int compare(File p1,File p2){
             if (p1.getName().compareTo(p2.getName())<0)
@@ -15,7 +16,8 @@ class ConvertFolder{
                 return 0;
         }
     };
-    //gitObject比较器
+
+    // gitObject比较器
     public static Comparator<GitObject> comparatorObject =new Comparator <GitObject>(){
         public int compare(GitObject p1,GitObject p2){
             if (p1.getKey().compareTo(p2.getKey())<0)
@@ -27,6 +29,7 @@ class ConvertFolder{
         }
     };
 
+    /**深度优先遍历文件夹，转换为Tree Object并存储到本地*/
     public static TreeObject dfs(String path, Stage stage, int depth) throws IOException {
         File dir = new File(path);
         File[] fs = dir.listFiles();
@@ -42,6 +45,7 @@ class ConvertFolder{
                 }
             }
             if(fs[i].isDirectory()){
+                // 忽略.mygit目录
                 if(!fs[i].getName().equals(".mygit")){
                     if(depth == 0){
                         TreeObject tree = genTree(path+File.separator+fs[i].getName(),stage);
@@ -68,6 +72,7 @@ class ConvertFolder{
         return tree;
     }
 
+    /**深度优先遍历文件夹，转换为Tree Object，不存储到本地*/
     public static TreeObject genTree(String path, Stage stage) throws IOException {
         File dir = new File(path);
         File[] fs = dir.listFiles();
@@ -181,6 +186,7 @@ class ConvertFolder{
         TreeObject tree = new TreeObject(dir.getName(), blobs_array, trees_array);
         return tree;
     }
+
     /**删除文件路径*/
     public static boolean deleteFolder(String path){
         boolean flag = false;
@@ -197,6 +203,7 @@ class ConvertFolder{
             }
         }
     }
+
     /**删除文件*/
     public static boolean deleteFile(String sPath) {
         boolean flag = false;
@@ -208,6 +215,7 @@ class ConvertFolder{
         }
         return flag;
     }
+
     /**删除文件夹*/
     public static boolean deleteDirectory(String sPath) {
         //如果sPath不以文件分隔符结尾，自动添加文件分隔符

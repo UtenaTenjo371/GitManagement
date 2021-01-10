@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 //------------- 保存对象用 -------------
 
 public class SaveObject{
+  /**保存对象*/
   public static void writeObjectToFile(String fileDir,Object obj)
   {
     File file =new File(fileDir);
@@ -27,6 +28,7 @@ public class SaveObject{
     }
   }
 
+  /**获取对象*/
   public static Object readObjectFromFile(String fileDir)
   {
     Object temp=null;

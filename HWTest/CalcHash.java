@@ -8,6 +8,7 @@ import java.util.Vector;
 public class CalcHash {
     private MessageDigest complete;
 
+    /**构造函数*/
     public CalcHash() {
         try {
             complete = MessageDigest.getInstance("SHA-1");
@@ -16,6 +17,7 @@ public class CalcHash {
         }
     }
 
+    /**添加文件，更新hash值*/
     public void addFile(File f) {
         try {
             FileInputStream is = new FileInputStream(f);
@@ -34,16 +36,19 @@ public class CalcHash {
         }
     }
 
+    /**添加字符串，更新hash值*/
     public void addString(String s) {
         complete.update(s.getBytes());
     }
 
+    /**添加（多个）字节，更新hash值*/
     public void addBytes(Vector<byte[]> bv) {
         for(byte[] b : bv){
             complete.update(b);
         }
     }
 
+    /**获取hash值*/
     public String getHash() {
         byte[] hash = complete.digest();
         StringBuilder resultStr = new StringBuilder("");
@@ -52,7 +57,6 @@ public class CalcHash {
             resultStr.append(Integer.toString(hash[i] & 0x0F, 16));
             //控制输出位数
         }
-
         return resultStr.toString();
     }
 }

@@ -6,17 +6,19 @@ import java.util.Vector;
 
 public class ObjectStore {
 
-    // private static final String rootDir=".mygit";
-    private static final String rootDir="F:\\20Java\\testgit\\.mygit";
+    private static final String rootDir=".mygit";
+    // 测试用路径
+    // private static final String rootDir="F:\\20Java\\testgit\\.mygit";
 
-    //构造函数，在当前目录的给定路径下存储各个objects
+    /**构造函数，在当前目录的给定路径下存储各个objects*/
     public ObjectStore(){
         File dirFile = new File(rootDir);
         if (!dirFile.isDirectory()){
             dirFile.mkdirs();
         }
     }
-    //对gitObject进行操作
+
+    // 对gitObject进行操作
     /**存储gitObject*/
     public static String add(GitObject f) {
         String hash = f.getKey();
@@ -31,6 +33,7 @@ public class ObjectStore {
         SaveObject.writeObjectToFile(dirFile.getPath()+"\\"+filename,f);
         return hash;
     }
+
     /**获得gitObject*/
     public static GitObject get(String key) {
         String dirname = key.substring(0,2);
@@ -41,6 +44,7 @@ public class ObjectStore {
         }
         return (GitObject)SaveObject.readObjectFromFile(dirFile.getPath()+"\\"+filename);
     }
+
     /**删除gitObject*/
     public static String delete(GitObject f) {
         String hash = f.getKey();
@@ -57,14 +61,13 @@ public class ObjectStore {
     public static BlobObject getBlob(String key){
         return (BlobObject)get(key);
     }
-
     public static TreeObject getTree(String key){
         return (TreeObject)get(key);
     }
-
     public static CommitObject getCommit(String key){
         return (CommitObject)get(key);
     }
+
     //对branch进行操作
     /**存储branch*/
     public static String saveBranch(Branch b) {
@@ -77,6 +80,7 @@ public class ObjectStore {
         SaveObject.writeObjectToFile(dirFile.getPath()+"\\"+filename,b);
         return hash;
     }
+
     /**获取branch*/
     public static Branch getBranch(String bName){
         File dirFile = new File(rootDir+"\\refs\\"+bName);
@@ -85,6 +89,7 @@ public class ObjectStore {
         }
         return (Branch)SaveObject.readObjectFromFile(dirFile.getPath());
     }
+
     /**判断branch是否存在*/
     public static boolean isBranch(String bName){
         File dirFile = new File(rootDir+"\\refs\\"+bName);
@@ -93,6 +98,7 @@ public class ObjectStore {
         }
         return true;
     }
+
     /**存储head*/
     public static String saveHead(String head) {
         //String headName=head.getBranchName();
@@ -103,6 +109,7 @@ public class ObjectStore {
         SaveObject.writeObjectToFile(dirFile.getPath()+"\\HEAD",head);
         return head;
     }
+
     /**获得head*/
     public static String getHead(){
         File dirFile = new File(rootDir+"\\HEAD");
@@ -112,6 +119,7 @@ public class ObjectStore {
         String branch=(String)SaveObject.readObjectFromFile(dirFile.getPath());
         return branch;
     }
+
     /**获得所有branch*/
     public static Vector<Branch> getAllBranch(){
         Vector<Branch> br=new Vector<Branch>();
@@ -122,6 +130,7 @@ public class ObjectStore {
         }
         return br;
     }
+
     /**删除branch*/
     public static boolean deleteBranch(String bName){
         File dirFile = new File(rootDir+"\\refs\\"+bName);
