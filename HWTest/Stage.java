@@ -4,9 +4,12 @@ import java.io.File;
 import java.io.IOException;
 
 public class Stage {
-    private static final String rootDir=".mygit\\index";
+    // private static final String rootDir=".mygit\\index";
+    private static final String rootDir="F:\\20Java\\testgit\\.mygit\\index";
 
-    public Stage() throws IOException {
+    public Stage(){}
+
+    public void initStage() throws IOException {
         File file = new File(rootDir);
         if(!file.exists())
             file.createNewFile();

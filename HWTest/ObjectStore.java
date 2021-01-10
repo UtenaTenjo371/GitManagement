@@ -6,7 +6,8 @@ import java.util.Vector;
 
 public class ObjectStore {
 
-    private static final String rootDir=".mygit";
+    // private static final String rootDir=".mygit";
+    private static final String rootDir="F:\\20Java\\testgit\\.mygit";
 
     //构造函数，在当前目录的给定路径下存储各个objects
     public ObjectStore(){

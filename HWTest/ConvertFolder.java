@@ -27,7 +27,7 @@ class ConvertFolder{
         }
     };
 
-    public static TreeObject dfs(String path, Stage stage) throws IOException {
+    public static TreeObject dfs(String path, Stage stage, int depth) throws IOException {
         File dir = new File(path);
         File[] fs = dir.listFiles();
         Arrays.sort(fs,comparatorFile);
@@ -36,17 +36,21 @@ class ConvertFolder{
         for(int i=0;i<fs.length;i++){
             if(fs[i].isFile()){
                 BlobObject blob = new BlobObject(fs[i]);
-                if(stage.inIndex(blob.getKey())){
+                if(depth != 0 || depth == 0 && stage.inIndex(blob.getKey())){
                     ObjectStore.add(blob);
                     blobs.add(blob);
                 }
             }
             if(fs[i].isDirectory()){
-                TreeObject tree = genTree(path+File.separator+fs[i].getName(),stage);
-                if(!stage.inIndex(tree.getKey()))
-                    return null;
-                dfs(path+File.separator+fs[i].getName(),stage);
-                trees.add(tree);
+                if(!fs[i].getName().equals(".mygit")){
+                    if(depth == 0){
+                        TreeObject tree = genTree(path+File.separator+fs[i].getName(),stage);
+                        if(!stage.inIndex(tree.getKey()))
+                            return null;
+                    }
+                    TreeObject tree = dfs(path+File.separator+fs[i].getName(),stage, depth+1);
+                    trees.add(tree);
+                }
             }
         }
         BlobObject[] blobs_array = new BlobObject[blobs.size()];
@@ -73,10 +77,7 @@ class ConvertFolder{
         for(int i=0;i<fs.length;i++){
             if(fs[i].isFile()){
                 BlobObject blob = new BlobObject(fs[i]);
-                if(stage.inIndex(blob.getKey())){
-                    ObjectStore.add(blob);
-                    blobs.add(blob);
-                }
+                blobs.add(blob);
             }
             if(fs[i].isDirectory()){
                 TreeObject tree = genTree(path+File.separator+fs[i].getName(),stage);
@@ -98,7 +99,7 @@ class ConvertFolder{
     }
 
     /**获取工作区目录*/
-    public static TreeObject changeFile(String path,TreeObject curTree, Stage stage) throws IOException {
+    public static TreeObject changeFile(String path,TreeObject curTree, Stage stage, int depth) throws IOException {
         //获得当前commit中树的tree,blob,存成哈希表待恢复列表
         Map<String,TreeObject> treesKey=new HashMap<String,TreeObject>();
         Map<String,BlobObject> blobsKey=new HashMap<String,BlobObject>();
@@ -117,9 +118,10 @@ class ConvertFolder{
         //删除多余blob,并在待恢复列表中删除已存在的blob
         for(int i=0;i<fs.length;i++){
             if(fs[i].isFile()){
-                BlobObject blob = new   BlobObject(fs[i]);
-                if(!blobsKey.containsKey(blob.getKey()) && stage.inIndex(blob.getKey())){
-                    deleteFolder(fs[i].getPath());
+                BlobObject blob = new BlobObject(fs[i]);
+                if(!blobsKey.containsKey(blob.getKey())){
+                    if(depth!=0 || depth == 0 && stage.inIndex(blob.getKey()))
+                        deleteFolder(fs[i].getPath());
                 }
                 else{
                     blobsKey.remove(blob.getKey());
@@ -131,16 +133,22 @@ class ConvertFolder{
                 for(String s:treeNames){
                     System.out.println(s);
                 }
-                if(!treesKey.containsKey(treeName)){
-                    TreeObject tree = genTree(path+File.separator+fs[i].getName(),stage);
-                    if(!stage.inIndex(tree.getKey()))
-                        deleteFolder(fs[i].getPath());
-                }
-                else{
-                    TreeObject target=treesKey.get(treeName);
-                    TreeObject tree = changeFile(path+File.separator+fs[i].getName(),target, stage);
-                    treesKey.remove(tree.getKey());
-                    trees.add(tree);
+                if(!treeName.equals(".mygit")){
+                    if(!treesKey.containsKey(treeName)){
+                        if(depth == 0){
+                            TreeObject tree = genTree(path+File.separator+fs[i].getName(),stage);
+                            if(!stage.inIndex(tree.getKey()))
+                                deleteFolder(fs[i].getPath());
+                        }
+                        else
+                            deleteFolder(fs[i].getPath());
+                    }
+                    else{
+                        TreeObject target=treesKey.get(treeName);
+                        TreeObject tree = changeFile(path+File.separator+fs[i].getName(),target, stage,depth+1);
+                        treesKey.remove(tree.getKey());
+                        trees.add(tree);
+                    }
                 }
             }
         }
@@ -155,7 +163,7 @@ class ConvertFolder{
             if (!dirFile.isDirectory()){
                 dirFile.mkdir();
             }
-            TreeObject tr = changeFile(path+File.separator+tree.getDirName(),tree, stage);
+            TreeObject tr = changeFile(path+File.separator+tree.getDirName(),tree, stage, depth+1);
             trees.add(tree);
         }
         //返回递归上一层文件夹的object

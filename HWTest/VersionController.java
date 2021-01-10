@@ -1,5 +1,7 @@
 package HWTest;
 
+import org.junit.jupiter.api.Test;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
@@ -7,9 +9,10 @@ import java.util.Vector;
 public class VersionController {
     private final String path;//文件夹路径
     private String head;//head指向工作区的branch分支
-    private String savePath=".mygit";
+    private String savePath="F:\\20Java\\testgit\\.mygit";
+    // private String savePath=".mygit";
     private GitLog gitlog;
-    private Stage stage = new Stage();
+    private Stage stage;
 
     public String getPath() {
         return path;
@@ -23,11 +26,22 @@ public class VersionController {
         this.path=path;
         this.head="main";
         this.gitlog = new GitLog();
+        this.stage = new Stage();
     }
 
     /**添加文件到暂存区*/
-    public void addFile(GitObject gitObject) throws IOException {
-        stage.addToIndex(gitObject.getKey());
+    public void addToStage(String fileName) throws IOException {
+        File file = new File(path+File.separator+fileName);
+        if(file.isFile()){
+            BlobObject blobObject = new BlobObject(file);
+            stage.addToIndex(blobObject.getKey());
+            System.out.println("Add "+fileName+" to stage");
+        }
+        else{
+            TreeObject treeObject = ConvertFolder.genTree(path+File.separator+fileName, stage);
+            stage.addToIndex(treeObject.getKey());
+            System.out.println("Add "+fileName+" to stage");
+        }
     }
 
     /**更新分支commit*/
@@ -36,7 +50,7 @@ public class VersionController {
             System.out.println("not a git repository");
             return;
         }
-        TreeObject tree=ConvertFolder.dfs(path, stage);
+        TreeObject tree=ConvertFolder.dfs(path, stage, 0);
         //String类型compareTo方法，返回两个string相差的ascii码
         Branch current=ObjectStore.getBranch(this.head);
         if(current.getLatestCommit()==null){
@@ -87,12 +101,13 @@ public class VersionController {
     }
 
     /**创建仓库*/
-    public void initRepository(){
+    public void initRepository() throws IOException {
         if(!isRepository()){
             Branch b=new Branch();
             b.save();
             ObjectStore.saveHead(this.head);
             gitlog.iniGitLog();
+            stage.initStage();
             System.out.println("initialized a repository");
         }
         else{
@@ -184,11 +199,18 @@ public class VersionController {
         if(args.length < 1)
             return;
 
-        VersionController versionController = new VersionController(System.getProperty("user.dir"));
+        // VersionController versionController = new VersionController(System.getProperty("user.dir"));
+        VersionController versionController = new VersionController("F:\\20Java\\testgit");
 
         switch(args[0]){
             case "init" : // git init
                 versionController.initRepository();
+                break;
+            case "add" :
+                if(args.length < 2)
+                    System.out.println("invalid input");
+                else
+                    versionController.addToStage(args[1]);
                 break;
             case "branch" :
                 if(args.length == 1) // git branch

@@ -13,7 +13,8 @@ public class GitLog {
     提交时的注释
      */
 
-    private static final String rootDir=".mygit\\logs";
+    private static final String rootDir="F:\\20Java\\testgit\\.mygit\\logs";
+    // private static final String rootDir=".mygit\\logs";
     private final String logDir = rootDir + "\\" + "HEAD";
 
     public GitLog(){}

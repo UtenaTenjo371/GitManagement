@@ -1,8 +1,16 @@
 package HWTest;
 
-import java.awt.*;
+import  org.junit.jupiter.api.Test;
+
+import java.io.IOException;
 
 public class test {
+    @Test
+    void testInit() throws IOException {
+        VersionController versionController = new VersionController("F:\\20Java\\test");
+        versionController.initRepository();
+    }
+
     public static void main(String[] args) {
         //测试branch的存储和读取
         /*Branch b=new Branch("main",new CommitObject(ConvertFolder.dfs("D:\\MyFile\\project\\PKU-1stSemester\\Java\\homework")));
