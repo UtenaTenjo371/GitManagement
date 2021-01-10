@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.Scanner;
 
 public class SaveString {
+    /**向文件写入内容*/
     public static void writeStringToFile(String fileDir,String line)
     {
         File file =new File(fileDir);
@@ -21,6 +22,7 @@ public class SaveString {
         }
     }
 
+    /**从文件中读取内容*/
     // line参数为负值 则表示读最后一行; 0表示读全部
     public static String readStringFromFile(String fileDir, int line)
     {
@@ -60,7 +62,7 @@ public class SaveString {
         return result.toString();
     }
 
-    // 覆写文件
+    /**覆写文件*/
     public static void overwriteStringToFile(String fileDir,String content)
     {
         File file =new File(fileDir);

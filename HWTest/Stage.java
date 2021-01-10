@@ -4,8 +4,9 @@ import java.io.File;
 import java.io.IOException;
 
 public class Stage {
-    // private static final String rootDir=".mygit\\index";
-    private static final String rootDir="F:\\20Java\\testgit\\.mygit\\index";
+    private static final String rootDir=".mygit\\index";
+    // 测试用路径
+    // private static final String rootDir="F:\\20Java\\testgit\\.mygit\\index";
 
     public Stage(){}
 

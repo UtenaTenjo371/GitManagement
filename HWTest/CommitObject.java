@@ -49,6 +49,7 @@ public class CommitObject extends GitObject{
         updateKey(); // 设置key
         save();
     }
+
     /**merge后的commit的构造方法*/
     public CommitObject(TreeObject rootTree, CommitObject parent, CommitObject mergeParent){
         rootTree.save();
@@ -61,6 +62,7 @@ public class CommitObject extends GitObject{
         save();
     }
 
+    /**计算hashkey*/
     public String calcKey() {
         CalcHash ch = new CalcHash();
 
