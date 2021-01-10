@@ -5,10 +5,13 @@ import java.io.IOException;
 import java.util.Vector;
 
 public class VersionController {
-    private final String path;//文件夹路径
-    private String head;//head指向工作区的branch分支
+    private final String path; // 文件夹路径
+    private String head; // head指向工作区的branch分支
+    // 测试用路径
+    // private String savePath="F:\\20Java\\testgit\\.mygit";
     private String savePath=".mygit";
     private GitLog gitlog;
+    private Stage stage;
 
     public String getPath() {
         return path;
@@ -18,21 +21,39 @@ public class VersionController {
         return head;
     }
 
-    public VersionController(String path){
+    /**构造方法*/
+    public VersionController(String path) throws IOException {
         this.path=path;
         this.head="main";
         this.gitlog = new GitLog();
+        this.stage = new Stage();
     }
 
     /**添加文件到暂存区*/
+    public void addToStage(String fileName) throws IOException {
+        File file = new File(path+File.separator+fileName);
+        // 对文件的处理
+        if(file.isFile()){
+            BlobObject blobObject = new BlobObject(file);
+            stage.addToIndex(blobObject.getKey());
+            System.out.println("Add "+fileName+" to stage");
+        }
+        // 对文件夹的处理
+        // 支持将根目录下的文件夹添加到暂存区，所选文件夹下的所有文件将被添加到暂存区
+        else{
+            TreeObject treeObject = ConvertFolder.genTree(path+File.separator+fileName, stage);
+            stage.addToIndex(treeObject.getKey());
+            System.out.println("Add "+fileName+" to stage");
+        }
+    }
 
     /**更新分支commit*/
-    public void addCommit(String commitMessage){
+    public void addCommit(String commitMessage) throws IOException {
         if(!checkIfRepository()){
             System.out.println("not a git repository");
             return;
         }
-        TreeObject tree=ConvertFolder.dfs(path);
+        TreeObject tree=ConvertFolder.dfs(path, stage, 0);
         //String类型compareTo方法，返回两个string相差的ascii码
         Branch current=ObjectStore.getBranch(this.head);
         if(current.getLatestCommit()==null){
@@ -83,12 +104,13 @@ public class VersionController {
     }
 
     /**创建仓库*/
-    public void initRepository(){
+    public void initRepository() throws IOException {
         if(!isRepository()){
             Branch b=new Branch();
             b.save();
             ObjectStore.saveHead(this.head);
             gitlog.iniGitLog();
+            stage.initStage();
             System.out.println("initialized a repository");
         }
         else{
@@ -112,12 +134,10 @@ public class VersionController {
         gitlog.updateLogAfterReset(commitKey);
         // --hard
         changeToCommit(commitKey);
-        // --soft
-        // --mixed
     }
 
     /**创建分支*/
-    public void createBranch(String branchName){
+    public void createBranch(String branchName) throws IOException {
         if(!checkIfRepository()){
             System.out.println("not a git repository");
             return;
@@ -132,7 +152,7 @@ public class VersionController {
     }
 
     /**切换分支*/
-    public void switchToBranch(String branchName){
+    public void switchToBranch(String branchName) throws IOException {
         if(!checkIfRepository()){
             System.out.println("not a git repository");
             return;
@@ -165,11 +185,13 @@ public class VersionController {
         if(branchName=="main") return false;
         return ObjectStore.deleteBranch(branchName);
     }
+
     /**恢复文件到指定版本*/
-    public void changeToCommit(String cHash){
+    public void changeToCommit(String cHash) throws IOException {
         CommitObject commit=ObjectStore.getCommit(cHash);
-        ConvertFolder.changeFile(path,commit.getRootTree());
+        ConvertFolder.changeFile(path,commit.getRootTree(), stage, 0);
     }
+
     /**合并分支*/
     public void mergeBranch(Branch branch1,Branch branch2){
 
@@ -180,32 +202,52 @@ public class VersionController {
         if(args.length < 1)
             return;
 
-        VersionController versionController = new VersionController(System.getProperty("user.dir"));
+        // VersionController versionController = new VersionController(System.getProperty("user.dir"));
+        VersionController versionController = new VersionController("F:\\20Java\\testgit");
 
         switch(args[0]){
-            case "init" : // git init
+            // git init
+            case "init" :
                 versionController.initRepository();
                 break;
-            case "branch" :
-                if(args.length == 1) // git branch
-                    versionController.printBranch();
+            // git add [filename]
+            case "add" :
+                if(args.length < 2)
+                    System.out.println("invalid input");
                 else
-                    versionController.createBranch(args[1]); // git branch branchname
+                    versionController.addToStage(args[1]);
                 break;
-            case "checkout" : // git checkout branchname
+            // git branch
+            // git branch [branchname]
+            // git branch -d [branchname]
+            case "branch" :
+                if(args.length == 1)
+                    versionController.printBranch();
+                else if (args.length == 2)
+                    versionController.createBranch(args[1]);
+                else if(args.length == 3 && args[1].equals("-d"))
+                    versionController.deleteBranch(args[2]);
+                else
+                    System.out.println("invalid input");
+                break;
+            // git checkout [branchname]
+            case "checkout" :
                 if(args.length < 2)
                     System.out.println("invalid input");
                 else
                     versionController.switchToBranch(args[1]);
-            case "commit" : // git commit -m "Commit message"
+            // git commit -m "Commit message"
+            case "commit" :
                 if(args.length < 3)
                     System.out.println("invalid input");
                 else
                     versionController.addCommit(args[2]);
                 break;
-            case "log" : // git log
+            // git log
+            case "log" :
                 versionController.printLog();
                 break;
+            // git reset [hashkey]
             case "reset" :
                 if(args.length < 2)
                     System.out.println("invalid input");

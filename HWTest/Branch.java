@@ -4,8 +4,8 @@ import java.io.Serializable;
 
 public class Branch implements  Serializable {
     private final String branchName;
-    private String latestCommit;//存储哈希值
-    //常量
+    private String latestCommit; // 存储哈希值
+    // 常量
     private static final String defaultBranch="main";
     private static final String nullCommitHash="0000000000000000000000000000000000000000";
 
@@ -40,6 +40,7 @@ public class Branch implements  Serializable {
         save();
     }
 
+    /**存储branch到本地*/
     public void save(){
         ObjectStore.saveBranch(this);
     }

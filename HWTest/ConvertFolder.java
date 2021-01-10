@@ -1,9 +1,11 @@
 package HWTest;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 class ConvertFolder{
+    // File比较器
     public static Comparator<File> comparatorFile =new Comparator <File>(){
         public int compare(File p1,File p2){
             if (p1.getName().compareTo(p2.getName())<0)
@@ -14,7 +16,8 @@ class ConvertFolder{
                 return 0;
         }
     };
-    //gitObject比较器
+
+    // gitObject比较器
     public static Comparator<GitObject> comparatorObject =new Comparator <GitObject>(){
         public int compare(GitObject p1,GitObject p2){
             if (p1.getKey().compareTo(p2.getKey())<0)
@@ -26,7 +29,8 @@ class ConvertFolder{
         }
     };
 
-    public static TreeObject dfs(String path){
+    /**深度优先遍历文件夹，转换为Tree Object并存储到本地*/
+    public static TreeObject dfs(String path, Stage stage, int depth) throws IOException {
         File dir = new File(path);
         File[] fs = dir.listFiles();
         Arrays.sort(fs,comparatorFile);
@@ -35,12 +39,22 @@ class ConvertFolder{
         for(int i=0;i<fs.length;i++){
             if(fs[i].isFile()){
                 BlobObject blob = new BlobObject(fs[i]);
-                ObjectStore.add(blob);
-                blobs.add(blob);
+                if(depth != 0 || depth == 0 && stage.inIndex(blob.getKey())){
+                    ObjectStore.add(blob);
+                    blobs.add(blob);
+                }
             }
             if(fs[i].isDirectory()){
-                TreeObject tree = dfs(path+File.separator+fs[i].getName());
-                trees.add(tree);
+                // 忽略.mygit目录
+                if(!fs[i].getName().equals(".mygit")){
+                    if(depth == 0){
+                        TreeObject tree = genTree(path+File.separator+fs[i].getName(),stage);
+                        if(!stage.inIndex(tree.getKey()))
+                            return null;
+                    }
+                    TreeObject tree = dfs(path+File.separator+fs[i].getName(),stage, depth+1);
+                    trees.add(tree);
+                }
             }
         }
         BlobObject[] blobs_array = new BlobObject[blobs.size()];
@@ -57,8 +71,40 @@ class ConvertFolder{
         ObjectStore.add(tree);
         return tree;
     }
+
+    /**深度优先遍历文件夹，转换为Tree Object，不存储到本地*/
+    public static TreeObject genTree(String path, Stage stage) throws IOException {
+        File dir = new File(path);
+        File[] fs = dir.listFiles();
+        Arrays.sort(fs,comparatorFile);
+        Vector<BlobObject> blobs = new Vector<>();
+        Vector<TreeObject> trees = new Vector<>();
+        for(int i=0;i<fs.length;i++){
+            if(fs[i].isFile()){
+                BlobObject blob = new BlobObject(fs[i]);
+                blobs.add(blob);
+            }
+            if(fs[i].isDirectory()){
+                TreeObject tree = genTree(path+File.separator+fs[i].getName(),stage);
+                trees.add(tree);
+            }
+        }
+        BlobObject[] blobs_array = new BlobObject[blobs.size()];
+        for(int j=0;j<blobs.size();j++){
+            blobs_array[j] = blobs.get(j);
+        }
+        TreeObject[] trees_array = new TreeObject[trees.size()];
+        for(int j=0;j<trees.size();j++){
+            trees_array[j] = trees.get(j);
+        }
+        Arrays.sort(blobs_array,comparatorObject);
+        Arrays.sort(trees_array,comparatorObject);
+        TreeObject tree = new TreeObject(dir.getName(), blobs_array, trees_array);
+        return tree;
+    }
+
     /**获取工作区目录*/
-    public static TreeObject changeFile(String path,TreeObject curTree){
+    public static TreeObject changeFile(String path,TreeObject curTree, Stage stage, int depth) throws IOException {
         //获得当前commit中树的tree,blob,存成哈希表待恢复列表
         Map<String,TreeObject> treesKey=new HashMap<String,TreeObject>();
         Map<String,BlobObject> blobsKey=new HashMap<String,BlobObject>();
@@ -77,9 +123,10 @@ class ConvertFolder{
         //删除多余blob,并在待恢复列表中删除已存在的blob
         for(int i=0;i<fs.length;i++){
             if(fs[i].isFile()){
-                BlobObject blob = new   BlobObject(fs[i]);
+                BlobObject blob = new BlobObject(fs[i]);
                 if(!blobsKey.containsKey(blob.getKey())){
-                    deleteFolder(fs[i].getPath());
+                    if(depth!=0 || depth == 0 && stage.inIndex(blob.getKey()))
+                        deleteFolder(fs[i].getPath());
                 }
                 else{
                     blobsKey.remove(blob.getKey());
@@ -91,14 +138,22 @@ class ConvertFolder{
                 for(String s:treeNames){
                     System.out.println(s);
                 }
-                if(!treesKey.containsKey(treeName)){
-                    deleteFolder(fs[i].getPath());
-                }
-                else{
-                    TreeObject target=treesKey.get(treeName);
-                    TreeObject tree = changeFile(path+File.separator+fs[i].getName(),target);
-                    treesKey.remove(tree.getKey());
-                    trees.add(tree);
+                if(!treeName.equals(".mygit")){
+                    if(!treesKey.containsKey(treeName)){
+                        if(depth == 0){
+                            TreeObject tree = genTree(path+File.separator+fs[i].getName(),stage);
+                            if(!stage.inIndex(tree.getKey()))
+                                deleteFolder(fs[i].getPath());
+                        }
+                        else
+                            deleteFolder(fs[i].getPath());
+                    }
+                    else{
+                        TreeObject target=treesKey.get(treeName);
+                        TreeObject tree = changeFile(path+File.separator+fs[i].getName(),target, stage,depth+1);
+                        treesKey.remove(tree.getKey());
+                        trees.add(tree);
+                    }
                 }
             }
         }
@@ -113,7 +168,7 @@ class ConvertFolder{
             if (!dirFile.isDirectory()){
                 dirFile.mkdir();
             }
-            TreeObject tr = changeFile(path+File.separator+tree.getDirName(),tree);
+            TreeObject tr = changeFile(path+File.separator+tree.getDirName(),tree, stage, depth+1);
             trees.add(tree);
         }
         //返回递归上一层文件夹的object
@@ -131,6 +186,7 @@ class ConvertFolder{
         TreeObject tree = new TreeObject(dir.getName(), blobs_array, trees_array);
         return tree;
     }
+
     /**删除文件路径*/
     public static boolean deleteFolder(String path){
         boolean flag = false;
@@ -147,6 +203,7 @@ class ConvertFolder{
             }
         }
     }
+
     /**删除文件*/
     public static boolean deleteFile(String sPath) {
         boolean flag = false;
@@ -158,6 +215,7 @@ class ConvertFolder{
         }
         return flag;
     }
+
     /**删除文件夹*/
     public static boolean deleteDirectory(String sPath) {
         //如果sPath不以文件分隔符结尾，自动添加文件分隔符
@@ -190,34 +248,5 @@ class ConvertFolder{
         } else {
             return false;
         }
-    }
-    public static void main(String[] args){
-        System.out.println("请输入一个文件夹的绝对路径：");
-        Scanner sc = new Scanner(System.in);
-        String path = sc.nextLine();
-        sc.close();
-
-        VersionController vc=new VersionController(path);
-        ObjectStore a = new ObjectStore();
-        ConvertFolder convertFolder = new ConvertFolder();
-        TreeObject tree = convertFolder.dfs(path);
-
-        System.out.println(tree.getDirName());
-        System.out.println("------------");
-        System.out.println("Blobs:");
-        BlobObject[] blobs = tree.getBlobs();
-        for(int i=0; i<blobs.length; i++){
-            System.out.println(blobs[i].getFileName());
-        }
-        System.out.println("------------");
-        System.out.println("Trees:");
-        TreeObject[] trees = tree.getTrees();
-        for(int i=0; i<trees.length; i++){
-            System.out.println(trees[i].getDirName());
-        }
-        //Commit测试
-        /*Branch newHead=vc.addCommit();
-        System.out.println("------------");
-        System.out.println(newHead.getBranchName()+" "+newHead);*/
     }
 }
