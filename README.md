@@ -3,14 +3,14 @@
 根据git版本控制原理，使用Java实现的版本管理工具。
 
 ## 项目说明
-实现功能介绍（版本控制基本功能）
-init : 初始化本地仓库
-branch : 创建/打印/删除 分支
-checkout : 切换至分支
-commit : 提交一个commit
-reset: 回滚到指定commit
-log: 打印当前分支的commit日志
-add: 将文件加入暂存区（目前实现了文件状态转换）
+实现功能介绍（版本控制基本功能）：
+* init : 初始化本地仓库
+* branch : 创建/打印/删除 分支
+* checkout : 切换至分支
+* commit : 提交一个commit
+* reset: 回滚到指定commit
+* log: 打印当前分支的commit日志
+* add: 将文件加入暂存区
 
 ### 层次图
 ![image](https://github.com/UtenaTenjo371/GitManagement/blob/main/Docs/Img/GitManage.png)
